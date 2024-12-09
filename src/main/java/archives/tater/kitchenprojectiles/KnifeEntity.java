@@ -1,0 +1,198 @@
+package archives.tater.kitchenprojectiles;
+
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.PersistentProjectileEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
+import vectorwing.farmersdelight.common.item.KnifeItem;
+import vectorwing.farmersdelight.common.item.enchantment.BackstabbingEnchantment;
+import vectorwing.farmersdelight.common.registry.ModEnchantments;
+import vectorwing.farmersdelight.common.registry.ModItems;
+
+public class KnifeEntity extends PersistentProjectileEntity {
+    private static final TrackedData<Byte> LOYALTY = DataTracker.registerData(KnifeEntity.class, TrackedDataHandlerRegistry.BYTE);
+    private static final TrackedData<Boolean> ENCHANTED = DataTracker.registerData(KnifeEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final TrackedData<ItemStack> KNIFE_STACK = DataTracker.registerData(KnifeEntity.class, TrackedDataHandlerRegistry.ITEM_STACK);
+    private boolean dealtDamage;
+    public int returnTimer;
+
+    protected KnifeEntity(EntityType<? extends PersistentProjectileEntity> entityType, World world) {
+        super(entityType, world);
+    }
+
+    public KnifeEntity(World world, LivingEntity owner, ItemStack stack) {
+        super(KitchenProjectiles.KNIFE_ENTITY, owner, world);
+        dataTracker.set(KNIFE_STACK, stack);
+        dataTracker.set(LOYALTY, (byte)EnchantmentHelper.getLoyalty(stack));
+        dataTracker.set(ENCHANTED, stack.hasGlint());
+    }
+
+    @Override
+    protected void initDataTracker() {
+        super.initDataTracker();
+        dataTracker.startTracking(LOYALTY, (byte)0);
+        dataTracker.startTracking(ENCHANTED, false);
+        dataTracker.startTracking(KNIFE_STACK, ModItems.IRON_KNIFE.get().getDefaultStack());
+    }
+
+    @Override
+    public void tick() {
+        if (inGroundTime > 4) {
+            dealtDamage = true;
+        }
+
+        Entity entity = getOwner();
+        int i = dataTracker.get(LOYALTY);
+        if (i > 0 && (dealtDamage || isNoClip()) && entity != null) {
+            if (!isOwnerAlive()) {
+                if (!getWorld().isClient && pickupType == PersistentProjectileEntity.PickupPermission.ALLOWED) {
+                    dropStack(asItemStack(), 0.1F);
+                }
+
+                discard();
+            } else {
+                setNoClip(true);
+                Vec3d vec3d = entity.getEyePos().subtract(getPos());
+                setPos(getX(), getY() + vec3d.y * 0.015 * (double)i, getZ());
+                if (getWorld().isClient) {
+                    lastRenderY = getY();
+                }
+
+                double d = 0.05 * (double)i;
+                setVelocity(getVelocity().multiply(0.95).add(vec3d.normalize().multiply(d)));
+                if (returnTimer == 0) {
+                    playSound(SoundEvents.ITEM_TRIDENT_RETURN, 10.0F, 1.0F);
+                }
+
+                returnTimer++;
+            }
+        }
+
+        super.tick();
+    }
+
+    private boolean isOwnerAlive() {
+        Entity owner = getOwner();
+        return owner != null && owner.isAlive() && (!(owner instanceof ServerPlayerEntity) || !owner.isSpectator());
+    }
+
+    public ItemStack getKnifeStack() {
+        return dataTracker.get(KNIFE_STACK);
+    }
+
+    protected void setKnifeStack(ItemStack stack) {
+        dataTracker.set(KNIFE_STACK, stack);
+    }
+
+    @Override
+    protected ItemStack asItemStack() {
+        return getKnifeStack().copy();
+    }
+
+    @Nullable
+    @Override
+    protected EntityHitResult getEntityCollision(Vec3d currentPosition, Vec3d nextPosition) {
+        return dealtDamage ? null : super.getEntityCollision(currentPosition, nextPosition);
+    }
+
+    @Override
+    protected void onEntityHit(EntityHitResult entityHitResult) {
+        var entity = entityHitResult.getEntity();
+        float damage = (1
+                + (getKnifeStack().getItem() instanceof KnifeItem knifeItem ? knifeItem.getAttackDamage() : 0)
+                + (entity instanceof LivingEntity livingEntity ? EnchantmentHelper.getAttackDamage(getKnifeStack(), livingEntity.getGroup()) : 0));
+
+        var backstabbingLevel = EnchantmentHelper.getLevel(ModEnchantments.BACKSTABBING.get(), getKnifeStack());
+        if (backstabbingLevel > 0 && entity instanceof LivingEntity livingEntity && BackstabbingEnchantment.isLookingBehindTarget(livingEntity, getPos())) {
+            damage = BackstabbingEnchantment.getBackstabbingDamagePerLevel(damage, backstabbingLevel);
+        }
+
+        var owner = getOwner();
+        // TODO
+        var damageSource = getDamageSources().trident(this, owner == null ? this : owner);
+        dealtDamage = true;
+        if (entity.damage(damageSource, damage)) {
+            if (entity.getType() == EntityType.ENDERMAN) {
+                return;
+            }
+
+            if (entity instanceof LivingEntity livingEntity2) {
+                if (owner instanceof LivingEntity) {
+                    EnchantmentHelper.onUserDamaged(livingEntity2, owner);
+                    EnchantmentHelper.onTargetDamaged((LivingEntity) owner, livingEntity2);
+                }
+
+                onHit(livingEntity2);
+            }
+        }
+
+        setVelocity(getVelocity().multiply(-0.01, -0.1, -0.01));
+
+        // TODO change this
+        playSound(SoundEvents.ITEM_TRIDENT_HIT, 1.0F, 1.0F);
+    }
+
+    @Override
+    protected boolean tryPickup(PlayerEntity player) {
+        return super.tryPickup(player) || isNoClip() && isOwner(player) && player.getInventory().insertStack(asItemStack());
+    }
+
+    @Override
+    protected SoundEvent getHitSound() {
+        // TODO change
+        return SoundEvents.ITEM_TRIDENT_HIT_GROUND;
+    }
+
+    @Override
+    public void onPlayerCollision(PlayerEntity player) {
+        if (isOwner(player) || getOwner() == null) {
+            super.onPlayerCollision(player);
+        }
+    }
+
+    @Override
+    public void readCustomDataFromNbt(NbtCompound nbt) {
+        super.readCustomDataFromNbt(nbt);
+        if (nbt.contains("Knife", NbtElement.COMPOUND_TYPE)) {
+            setKnifeStack(ItemStack.fromNbt(nbt.getCompound("Knife")));
+        }
+
+        dealtDamage = nbt.getBoolean("DealtDamage");
+        dataTracker.set(LOYALTY, (byte)EnchantmentHelper.getLoyalty(getKnifeStack()));
+    }
+
+    @Override
+    public void writeCustomDataToNbt(NbtCompound nbt) {
+        super.writeCustomDataToNbt(nbt);
+        nbt.put("Knife", getKnifeStack().writeNbt(new NbtCompound()));
+        nbt.putBoolean("DealtDamage", dealtDamage);
+    }
+
+    @Override
+    public void age() {
+        int i = dataTracker.get(LOYALTY);
+        if (pickupType != PersistentProjectileEntity.PickupPermission.ALLOWED || i <= 0) {
+            super.age();
+        }
+    }
+
+    @Override
+    public boolean shouldRender(double cameraX, double cameraY, double cameraZ) {
+        return true;
+    }
+}
