@@ -1,5 +1,6 @@
 package archives.tater.kitchenprojectiles.mixin;
 
+import archives.tater.kitchenprojectiles.KitchenProjectilesSounds;
 import archives.tater.kitchenprojectiles.KnifeEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -7,7 +8,6 @@ import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
@@ -59,7 +59,7 @@ public abstract class KnifeItemMixin extends Item {
 			}
 
 			world.spawnEntity(knifeEntity);
-			world.playSoundFromEntity(null, knifeEntity, SoundEvents.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1.0F, 1.0F);
+			world.playSoundFromEntity(null, knifeEntity, KitchenProjectilesSounds.throwing(stack), SoundCategory.PLAYERS, 1.0F, 1.0F);
 		}
 
 		if (!playerEntity.getAbilities().creativeMode)

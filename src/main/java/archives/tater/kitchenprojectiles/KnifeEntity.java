@@ -14,7 +14,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Vec3d;
@@ -77,7 +76,7 @@ public class KnifeEntity extends PersistentProjectileEntity {
                 double d = 0.05 * (double) loyaltyLevel;
                 setVelocity(getVelocity().multiply(0.95).add(vec3d.normalize().multiply(d)));
                 if (returnTimer == 0) {
-                    playSound(SoundEvents.ITEM_TRIDENT_RETURN, 10.0F, 1.0F);
+                    playSound(KitchenProjectilesSounds.returning(getKnifeStack()), 10.0F, 1.0F);
                     setVelocity(0, 0, 0);
                 }
 
@@ -145,8 +144,7 @@ public class KnifeEntity extends PersistentProjectileEntity {
 
         setVelocity(getVelocity().multiply(-0.01, -0.1, -0.01));
 
-        // TODO change this
-        playSound(SoundEvents.ITEM_TRIDENT_HIT, 1.0F, 1.0F);
+        playSound(KitchenProjectilesSounds.hit(getKnifeStack()), 1.0F, 1.0F);
     }
 
     @Override
@@ -161,8 +159,7 @@ public class KnifeEntity extends PersistentProjectileEntity {
 
     @Override
     protected SoundEvent getHitSound() {
-        // TODO change
-        return SoundEvents.ITEM_TRIDENT_HIT_GROUND;
+        return KitchenProjectilesSounds.hitGround(getKnifeStack());
     }
 
     @Override
