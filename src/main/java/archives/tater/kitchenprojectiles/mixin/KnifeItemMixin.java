@@ -12,9 +12,11 @@ import net.minecraft.stat.Stats;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.UseAction;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import vectorwing.farmersdelight.common.item.KnifeItem;
+import vectorwing.farmersdelight.common.registry.ModBlocks;
 
 @Mixin(KnifeItem.class)
 public abstract class KnifeItemMixin extends Item {
@@ -25,8 +27,11 @@ public abstract class KnifeItemMixin extends Item {
 
 	@Override
 	public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+		var stack = user.getStackInHand(hand);
+		if (world.getBlockState(raycast(world, user, RaycastContext.FluidHandling.NONE).getBlockPos()).isOf(ModBlocks.CUTTING_BOARD.get()))
+			return TypedActionResult.pass(stack);
 		user.setCurrentHand(hand);
-		return TypedActionResult.consume(user.getStackInHand(hand));
+		return TypedActionResult.consume(stack);
 	}
 
 	@Override

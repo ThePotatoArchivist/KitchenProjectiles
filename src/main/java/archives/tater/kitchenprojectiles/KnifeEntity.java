@@ -78,6 +78,7 @@ public class KnifeEntity extends PersistentProjectileEntity {
                 setVelocity(getVelocity().multiply(0.95).add(vec3d.normalize().multiply(d)));
                 if (returnTimer == 0) {
                     playSound(SoundEvents.ITEM_TRIDENT_RETURN, 10.0F, 1.0F);
+                    setVelocity(0, 0, 0);
                 }
 
                 returnTimer++;
@@ -151,7 +152,6 @@ public class KnifeEntity extends PersistentProjectileEntity {
     @Override
     protected void onBlockHit(BlockHitResult blockHitResult) {
         super.onBlockHit(blockHitResult);
-        setVelocity(0, 0, 0);
     }
 
     @Override
