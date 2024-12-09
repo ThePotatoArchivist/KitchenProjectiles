@@ -1,0 +1,6 @@
+{
+  "parent": "kitchenprojectiles:item/knife_throwing",
+  "textures": {
+    "layer0": "farmersdelight:item/diamond_knife"
+  }
+}

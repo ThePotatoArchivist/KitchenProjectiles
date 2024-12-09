@@ -55,10 +55,10 @@ public abstract class KnifeItemMixin extends Item {
 
 			world.spawnEntity(knifeEntity);
 			world.playSoundFromEntity(null, knifeEntity, SoundEvents.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1.0F, 1.0F);
-			if (!playerEntity.getAbilities().creativeMode) {
-				playerEntity.getInventory().removeOne(stack);
-			}
 		}
+
+		if (!playerEntity.getAbilities().creativeMode)
+			playerEntity.getInventory().removeOne(stack);
 
 		playerEntity.incrementStat(Stats.USED.getOrCreateStat(this));
 	}

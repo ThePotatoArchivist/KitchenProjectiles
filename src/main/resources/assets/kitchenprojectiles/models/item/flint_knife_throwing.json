@@ -1,0 +1,6 @@
+{
+  "parent": "kitchenprojectiles:item/knife_throwing",
+  "textures": {
+    "layer0": "farmersdelight:item/flint_knife"
+  }
+}

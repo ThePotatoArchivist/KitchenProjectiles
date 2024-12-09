@@ -15,6 +15,7 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -57,8 +58,8 @@ public class KnifeEntity extends PersistentProjectileEntity {
         }
 
         Entity entity = getOwner();
-        int i = dataTracker.get(LOYALTY);
-        if (i > 0 && (dealtDamage || isNoClip()) && entity != null) {
+        var loyaltyLevel = dataTracker.get(LOYALTY);
+        if (loyaltyLevel > 0 && (dealtDamage || isNoClip()) && entity != null) {
             if (!isOwnerAlive()) {
                 if (!getWorld().isClient && pickupType == PersistentProjectileEntity.PickupPermission.ALLOWED) {
                     dropStack(asItemStack(), 0.1F);
@@ -68,12 +69,12 @@ public class KnifeEntity extends PersistentProjectileEntity {
             } else {
                 setNoClip(true);
                 Vec3d vec3d = entity.getEyePos().subtract(getPos());
-                setPos(getX(), getY() + vec3d.y * 0.015 * (double)i, getZ());
+                setPos(getX(), getY() + vec3d.y * 0.015 * (double) loyaltyLevel, getZ());
                 if (getWorld().isClient) {
                     lastRenderY = getY();
                 }
 
-                double d = 0.05 * (double)i;
+                double d = 0.05 * (double) loyaltyLevel;
                 setVelocity(getVelocity().multiply(0.95).add(vec3d.normalize().multiply(d)));
                 if (returnTimer == 0) {
                     playSound(SoundEvents.ITEM_TRIDENT_RETURN, 10.0F, 1.0F);
@@ -145,6 +146,12 @@ public class KnifeEntity extends PersistentProjectileEntity {
 
         // TODO change this
         playSound(SoundEvents.ITEM_TRIDENT_HIT, 1.0F, 1.0F);
+    }
+
+    @Override
+    protected void onBlockHit(BlockHitResult blockHitResult) {
+        super.onBlockHit(blockHitResult);
+        setVelocity(0, 0, 0);
     }
 
     @Override
