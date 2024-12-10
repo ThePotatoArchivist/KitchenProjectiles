@@ -1,0 +1,8 @@
+{
+  "subtitles.entity.kitchenprojectiles.knife.throw": "Knife flies",
+  "subtitles.entity.kitchenprojectiles.knife.hit": "Knife stabs",
+  "subtitles.entity.kitchenprojectiles.knife.hit_ground": "Knife vibrates",
+  "subtitles.entity.kitchenprojectiles.knife.return": "Knife returns",
+  "death.attack.kitchenprojectiles.knife": "%s was stabbed by %s",
+  "death.attack.kitchenprojectiles.knife.item": "%s was stabbed by %s with %s"
+}

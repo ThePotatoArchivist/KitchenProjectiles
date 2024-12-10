@@ -1,5 +1,5 @@
 {
-  "item.kitchenprojectiles.knife.heavy.hit": {
+  "entity.kitchenprojectiles.knife.heavy.hit": {
     "sounds": [
       {
         "name": "item/trident/pierce1",
@@ -14,9 +14,9 @@
         "pitch": 1.1
       }
     ],
-    "subtitle": "subtitles.item.kitchenprojectiles.knife.hit"
+    "subtitle": "subtitles.entity.kitchenprojectiles.knife.hit"
   },
-  "item.kitchenprojectiles.knife.heavy.hit_ground": {
+  "entity.kitchenprojectiles.knife.heavy.hit_ground": {
     "sounds": [
       {
         "name": "item/trident/ground_impact1",
@@ -39,9 +39,9 @@
         "pitch": 1.3
       }
     ],
-    "subtitle": "subtitles.item.kitchenprojectiles.knife.hit_ground"
+    "subtitle": "subtitles.entity.kitchenprojectiles.knife.hit_ground"
   },
-  "item.kitchenprojectiles.knife.heavy.return": {
+  "entity.kitchenprojectiles.knife.heavy.return": {
     "sounds": [
       {
         "name": "item/trident/return1",
@@ -59,9 +59,9 @@
         "pitch": 1.3
       }
     ],
-    "subtitle": "subtitles.item.kitchenprojectiles.knife.return"
+    "subtitle": "subtitles.entity.kitchenprojectiles.knife.return"
   },
-  "item.kitchenprojectiles.knife.heavy.throw": {
+  "entity.kitchenprojectiles.knife.heavy.throw": {
     "sounds": [
       {
         "name": "item/trident/throw1",
@@ -72,9 +72,9 @@
         "pitch": 1.3
       }
     ],
-    "subtitle": "subtitles.item.kitchenprojectiles.knife.throw"
+    "subtitle": "subtitles.entity.kitchenprojectiles.knife.throw"
   },
-  "item.kitchenprojectiles.knife.light.hit": {
+  "entity.kitchenprojectiles.knife.light.hit": {
     "sounds": [
       {
         "name": "item/trident/pierce1",
@@ -89,9 +89,9 @@
         "pitch": 1.4
       }
     ],
-    "subtitle": "subtitles.item.kitchenprojectiles.knife.hit"
+    "subtitle": "subtitles.entity.kitchenprojectiles.knife.hit"
   },
-  "item.kitchenprojectiles.knife.light.hit_ground": {
+  "entity.kitchenprojectiles.knife.light.hit_ground": {
     "sounds": [
       {
         "name": "item/trident/ground_impact1",
@@ -114,9 +114,9 @@
         "pitch": 1.7
       }
     ],
-    "subtitle": "subtitles.item.kitchenprojectiles.knife.hit_ground"
+    "subtitle": "subtitles.entity.kitchenprojectiles.knife.hit_ground"
   },
-  "item.kitchenprojectiles.knife.light.return": {
+  "entity.kitchenprojectiles.knife.light.return": {
     "sounds": [
       {
         "name": "item/trident/return1",
@@ -134,9 +134,9 @@
         "pitch": 1.6
       }
     ],
-    "subtitle": "subtitles.item.kitchenprojectiles.knife.return"
+    "subtitle": "subtitles.entity.kitchenprojectiles.knife.return"
   },
-  "item.kitchenprojectiles.knife.light.throw": {
+  "entity.kitchenprojectiles.knife.light.throw": {
     "sounds": [
       {
         "name": "random/bow",
@@ -151,6 +151,6 @@
         "pitch": 1.25
       }
     ],
-    "subtitle": "subtitles.item.kitchenprojectiles.knife.throw"
+    "subtitle": "subtitles.entity.kitchenprojectiles.knife.throw"
   }
 }

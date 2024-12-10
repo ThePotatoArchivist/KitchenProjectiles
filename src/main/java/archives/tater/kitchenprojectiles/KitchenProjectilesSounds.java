@@ -17,14 +17,14 @@ public class KitchenProjectilesSounds {
         return of(new Identifier(KitchenProjectiles.MOD_ID, path));
     }
 
-    public static final SoundEvent KNIFE_THROW_LIGHT = of("item.kitchenprojectiles.knife.light.throw");
-    public static final SoundEvent KNIFE_HIT_LIGHT = of("item.kitchenprojectiles.knife.light.hit");
-    public static final SoundEvent KNIFE_GROUND_LIGHT = of("item.kitchenprojectiles.knife.light.hit_ground");
-    public static final SoundEvent KNIFE_RETURN_LIGHT = of("item.kitchenprojectiles.knife.light.return");
-    public static final SoundEvent KNIFE_THROW_HEAVY = of("item.kitchenprojectiles.knife.heavy.throw");
-    public static final SoundEvent KNIFE_HIT_HEAVY = of("item.kitchenprojectiles.knife.heavy.hit");
-    public static final SoundEvent KNIFE_GROUND_HEAVY = of("item.kitchenprojectiles.knife.heavy.hit_ground");
-    public static final SoundEvent KNIFE_RETURN_HEAVY = of("item.kitchenprojectiles.knife.heavy.return");
+    public static final SoundEvent KNIFE_THROW_LIGHT = of("entity.kitchenprojectiles.knife.light.throw");
+    public static final SoundEvent KNIFE_HIT_LIGHT = of("entity.kitchenprojectiles.knife.light.hit");
+    public static final SoundEvent KNIFE_GROUND_LIGHT = of("entity.kitchenprojectiles.knife.light.hit_ground");
+    public static final SoundEvent KNIFE_RETURN_LIGHT = of("entity.kitchenprojectiles.knife.light.return");
+    public static final SoundEvent KNIFE_THROW_HEAVY = of("entity.kitchenprojectiles.knife.heavy.throw");
+    public static final SoundEvent KNIFE_HIT_HEAVY = of("entity.kitchenprojectiles.knife.heavy.hit");
+    public static final SoundEvent KNIFE_GROUND_HEAVY = of("entity.kitchenprojectiles.knife.heavy.hit_ground");
+    public static final SoundEvent KNIFE_RETURN_HEAVY = of("entity.kitchenprojectiles.knife.heavy.return");
 
     public static boolean isKnifeHeavy(ItemStack knifeStack) {
         return knifeStack.getItem() instanceof ToolItem toolItem && toolItem.getMaterial().getMiningLevel() >= MiningLevels.DIAMOND;

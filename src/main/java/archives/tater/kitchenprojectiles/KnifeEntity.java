@@ -15,6 +15,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.text.Text;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Vec3d;
@@ -142,8 +143,7 @@ public class KnifeEntity extends PersistentProjectileEntity {
         }
 
         var owner = getOwner();
-        // TODO
-        var damageSource = getDamageSources().trident(this, owner == null ? this : owner);
+        var damageSource = getDamageSources().create(KitchenProjectiles.KNIFE_DAMAGE, this, owner == null ? this : owner);
         dealtDamage = true;
         if (entity.damage(damageSource, damage)) {
             if (entity.getType() == EntityType.ENDERMAN) {
@@ -233,5 +233,10 @@ public class KnifeEntity extends PersistentProjectileEntity {
     @Override
     public boolean shouldRender(double cameraX, double cameraY, double cameraZ) {
         return true;
+    }
+
+    @Override
+    public Text getName() {
+        return getKnifeStack().getName();
     }
 }
