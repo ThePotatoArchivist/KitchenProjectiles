@@ -3,15 +3,15 @@
 	"id": "kitchenprojectiles",
 	"version": "${version}",
 	"name": "Kitchen Projectiles",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Makes Farmer's Delight knives throwable",
 	"authors": [
-		"Me!"
+		"ThePotatoArchivist"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"homepage": "https://modrinth.com/mod/kitchen-projectiles",
+		"sources": "https://github.com/JosiahFu/KitchenProjectiles"
 	},
-	"license": "CC0-1.0",
+	"license": "MIT",
 	"icon": "assets/kitchenprojectiles/icon.png",
 	"environment": "*",
 	"entrypoints": {
@@ -33,9 +33,9 @@
 		"fabricloader": ">=0.16.9",
 		"minecraft": "~1.20.1",
 		"java": ">=17",
-		"fabric-api": "*"
+		"fabric-api": "*",
+		"farmersdelight": ">=1.20.1-2.2.4"
 	},
 	"suggests": {
-		"another-mod": "*"
 	}
 }
