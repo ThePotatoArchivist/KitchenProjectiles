@@ -225,8 +225,7 @@ public class KnifeEntity extends PersistentProjectileEntity {
 
     @Override
     public void age() {
-        int i = dataTracker.get(LOYALTY);
-        if (pickupType != PersistentProjectileEntity.PickupPermission.ALLOWED || i <= 0) {
+        if (pickupType != PersistentProjectileEntity.PickupPermission.ALLOWED) {
             super.age();
         }
     }
