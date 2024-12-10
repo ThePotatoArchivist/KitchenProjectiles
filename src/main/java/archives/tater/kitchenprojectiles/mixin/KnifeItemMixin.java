@@ -2,6 +2,8 @@ package archives.tater.kitchenprojectiles.mixin;
 
 import archives.tater.kitchenprojectiles.KitchenProjectilesSounds;
 import archives.tater.kitchenprojectiles.KnifeEntity;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
@@ -52,14 +54,19 @@ public abstract class KnifeItemMixin extends Item {
 		if (!world.isClient) {
 			stack.damage(1, user, p -> p.sendToolBreakStatus(user.getActiveHand()));
 
-			var knifeEntity = new KnifeEntity(world, playerEntity, stack);
-			knifeEntity.setVelocity(playerEntity, playerEntity.getPitch(), playerEntity.getYaw(), 0.0F, 1.5f, 1.0F);
-			if (playerEntity.getAbilities().creativeMode) {
-				knifeEntity.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
-			}
+			var multishot = EnchantmentHelper.getLevel(Enchantments.MULTISHOT, stack) > 0;
 
-			world.spawnEntity(knifeEntity);
-			world.playSoundFromEntity(null, knifeEntity, KitchenProjectilesSounds.throwing(stack), SoundCategory.PLAYERS, 1.0F, 1.0F);
+			for (var i = multishot ? -1 : 0; i <= (multishot ? 1 : 0); i++) {
+				var knifeEntity = new KnifeEntity(world, playerEntity, stack, i != 0);
+				knifeEntity.setVelocity(playerEntity, playerEntity.getPitch(), playerEntity.getYaw() + i * 15, 0.0F, 1.5f, 1.0F);
+				if (playerEntity.getAbilities().creativeMode || i != 0) {
+					knifeEntity.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
+				}
+
+				world.spawnEntity(knifeEntity);
+				if (i == 0)
+					world.playSoundFromEntity(null, knifeEntity, KitchenProjectilesSounds.throwing(stack), SoundCategory.PLAYERS, 1.0F, 1.0F);
+			}
 		}
 
 		if (!playerEntity.getAbilities().creativeMode)

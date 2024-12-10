@@ -48,10 +48,9 @@ public class KnifeEntityRenderer extends EntityRenderer<KnifeEntity> {
             matrices.translate(scale * 0.2, scale * 0.1, 0);
             matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-45));
             matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180));
-            itemRenderer
-                    .renderItem(
-                            entity.getKnifeStack(), ModelTransformationMode.NONE, light, OverlayTexture.DEFAULT_UV, matrices, vertexConsumers, entity.getWorld(), entity.getId()
-                    );
+            itemRenderer.renderItem(
+                    entity.getKnifeStack(), ModelTransformationMode.NONE, light, OverlayTexture.DEFAULT_UV, matrices, vertexConsumers, entity.getWorld(), entity.getId()
+            );
             matrices.pop();
             super.render(entity, yaw, tickDelta, matrices, vertexConsumers, light);
         }

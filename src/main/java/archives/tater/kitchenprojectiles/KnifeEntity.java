@@ -28,6 +28,7 @@ public class KnifeEntity extends PersistentProjectileEntity {
     private static final TrackedData<Byte> LOYALTY = DataTracker.registerData(KnifeEntity.class, TrackedDataHandlerRegistry.BYTE);
     private static final TrackedData<Boolean> ENCHANTED = DataTracker.registerData(KnifeEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<ItemStack> KNIFE_STACK = DataTracker.registerData(KnifeEntity.class, TrackedDataHandlerRegistry.ITEM_STACK);
+    private static final TrackedData<Boolean> SIMULATED = DataTracker.registerData(KnifeEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private boolean dealtDamage;
     public int returnTimer;
 
@@ -35,11 +36,12 @@ public class KnifeEntity extends PersistentProjectileEntity {
         super(entityType, world);
     }
 
-    public KnifeEntity(World world, LivingEntity owner, ItemStack stack) {
+    public KnifeEntity(World world, LivingEntity owner, ItemStack stack, boolean simulated) {
         super(KitchenProjectiles.KNIFE_ENTITY, owner, world);
         dataTracker.set(KNIFE_STACK, stack);
         dataTracker.set(LOYALTY, (byte)EnchantmentHelper.getLoyalty(stack));
         dataTracker.set(ENCHANTED, stack.hasGlint());
+        dataTracker.set(SIMULATED, simulated);
     }
 
     @Override
@@ -48,6 +50,7 @@ public class KnifeEntity extends PersistentProjectileEntity {
         dataTracker.startTracking(LOYALTY, (byte)0);
         dataTracker.startTracking(ENCHANTED, false);
         dataTracker.startTracking(KNIFE_STACK, ModItems.IRON_KNIFE.get().getDefaultStack());
+        dataTracker.startTracking(SIMULATED, false);
     }
 
     @Override
@@ -58,7 +61,7 @@ public class KnifeEntity extends PersistentProjectileEntity {
 
         Entity entity = getOwner();
         var loyaltyLevel = dataTracker.get(LOYALTY);
-        if (loyaltyLevel > 0 && (dealtDamage || isNoClip()) && entity != null) {
+        if (loyaltyLevel > 0 && !dataTracker.get(SIMULATED) && (dealtDamage || isNoClip()) && entity != null) {
             if (!isOwnerAlive()) {
                 if (!getWorld().isClient && pickupType == PersistentProjectileEntity.PickupPermission.ALLOWED) {
                     dropStack(asItemStack(), 0.1F);
@@ -98,6 +101,10 @@ public class KnifeEntity extends PersistentProjectileEntity {
 
     protected void setKnifeStack(ItemStack stack) {
         dataTracker.set(KNIFE_STACK, stack);
+    }
+
+    public boolean isSimulated() {
+        return dataTracker.get(SIMULATED);
     }
 
     @Override
@@ -177,6 +184,7 @@ public class KnifeEntity extends PersistentProjectileEntity {
         }
 
         dealtDamage = nbt.getBoolean("DealtDamage");
+        dataTracker.set(SIMULATED, nbt.getBoolean("Simulated"));
         dataTracker.set(LOYALTY, (byte)EnchantmentHelper.getLoyalty(getKnifeStack()));
     }
 
@@ -185,6 +193,7 @@ public class KnifeEntity extends PersistentProjectileEntity {
         super.writeCustomDataToNbt(nbt);
         nbt.put("Knife", getKnifeStack().writeNbt(new NbtCompound()));
         nbt.putBoolean("DealtDamage", dealtDamage);
+        nbt.putBoolean("Simulated", dataTracker.get(SIMULATED));
     }
 
     @Override
