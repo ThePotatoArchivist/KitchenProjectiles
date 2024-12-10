@@ -8,6 +8,7 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -30,6 +31,7 @@ public class KnifeEntity extends PersistentProjectileEntity {
     private static final TrackedData<ItemStack> KNIFE_STACK = DataTracker.registerData(KnifeEntity.class, TrackedDataHandlerRegistry.ITEM_STACK);
     private static final TrackedData<Boolean> SIMULATED = DataTracker.registerData(KnifeEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private boolean dealtDamage;
+    private int slot = -1;
     public int returnTimer;
 
     protected KnifeEntity(EntityType<? extends PersistentProjectileEntity> entityType, World world) {
@@ -39,9 +41,18 @@ public class KnifeEntity extends PersistentProjectileEntity {
     public KnifeEntity(World world, LivingEntity owner, ItemStack stack, boolean simulated) {
         super(KitchenProjectiles.KNIFE_ENTITY, owner, world);
         dataTracker.set(KNIFE_STACK, stack);
-        dataTracker.set(LOYALTY, (byte)EnchantmentHelper.getLoyalty(stack));
+        dataTracker.set(LOYALTY, (byte) EnchantmentHelper.getLoyalty(stack));
         dataTracker.set(ENCHANTED, stack.hasGlint());
         dataTracker.set(SIMULATED, simulated);
+        if (owner instanceof PlayerEntity playerEntity) {
+            var inventory = playerEntity.getInventory();
+            var size = inventory.size();
+            for (int iSlot = 0; iSlot < size; iSlot++)
+                if (inventory.getStack(iSlot) == stack) {
+                    slot = iSlot;
+                    break;
+                }
+        }
     }
 
     @Override
@@ -161,7 +172,21 @@ public class KnifeEntity extends PersistentProjectileEntity {
 
     @Override
     protected boolean tryPickup(PlayerEntity player) {
-        return super.tryPickup(player) || isNoClip() && isOwner(player) && player.getInventory().insertStack(asItemStack());
+        var inventory = player.getInventory();
+        var stack = asItemStack();
+        return switch (this.pickupType) {
+            case ALLOWED -> insertStack(inventory, slot, stack);
+            case CREATIVE_ONLY -> player.getAbilities().creativeMode;
+            default -> false;
+        } || isNoClip() && isOwner(player) && insertStack(inventory, slot, stack);
+    }
+
+    private static boolean insertStack(PlayerInventory playerInventory, int slot, ItemStack stack) {
+        if (playerInventory.getStack(slot).isEmpty()) {
+            playerInventory.setStack(slot, stack);
+            return true;
+        }
+        return playerInventory.insertStack(stack);
     }
 
     @Override
@@ -186,6 +211,7 @@ public class KnifeEntity extends PersistentProjectileEntity {
         dealtDamage = nbt.getBoolean("DealtDamage");
         dataTracker.set(SIMULATED, nbt.getBoolean("Simulated"));
         dataTracker.set(LOYALTY, (byte)EnchantmentHelper.getLoyalty(getKnifeStack()));
+        slot = nbt.getInt("Slot");
     }
 
     @Override
@@ -194,6 +220,7 @@ public class KnifeEntity extends PersistentProjectileEntity {
         nbt.put("Knife", getKnifeStack().writeNbt(new NbtCompound()));
         nbt.putBoolean("DealtDamage", dealtDamage);
         nbt.putBoolean("Simulated", dataTracker.get(SIMULATED));
+        nbt.putInt("Slot", slot);
     }
 
     @Override

@@ -49,18 +49,16 @@ public abstract class KnifeItemMixin extends Item {
 	@Override
 	public void onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
 		if (!(user instanceof PlayerEntity playerEntity)) return;
-		var useTicks = getMaxUseTime(stack) - remainingUseTicks;
-		if (useTicks < 6) return;
+        if (getMaxUseTime(stack) - remainingUseTicks < 6) return;
 
 		if (!world.isClient) {
 			stack.damage(1, user, p -> p.sendToolBreakStatus(user.getActiveHand()));
 
-			var speed = 0.5f + 0.25f * Math.min(useTicks - 6, 6);
 			var multishot = EnchantmentHelper.getLevel(Enchantments.MULTISHOT, stack) > 0;
 
 			for (var i = multishot ? -1 : 0; i <= (multishot ? 1 : 0); i++) {
 				var knifeEntity = new KnifeEntity(world, playerEntity, stack, i != 0);
-				knifeEntity.setVelocity(playerEntity, playerEntity.getPitch(), playerEntity.getYaw() + i * 15, 0.0F, speed, 1.0F);
+				knifeEntity.setVelocity(playerEntity, playerEntity.getPitch(), playerEntity.getYaw() + i * 15, 0.0F, 1.5f, 1.0F);
 				if (playerEntity.getAbilities().creativeMode || i != 0) {
 					knifeEntity.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
 				}
