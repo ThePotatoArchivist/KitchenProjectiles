@@ -239,4 +239,13 @@ public class KnifeEntity extends PersistentProjectileEntity {
     public Text getName() {
         return getKnifeStack().getName();
     }
+
+    @Override
+    protected void tickInVoid() {
+        if (dataTracker.get(LOYALTY) <= 0) super.tickInVoid();
+        if (!dealtDamage) {
+            dealtDamage = true;
+            setVelocity(0, 0, 0);
+        }
+    }
 }

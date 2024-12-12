@@ -57,8 +57,8 @@ public class KnifeEntityRenderer extends EntityRenderer<KnifeEntity> {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public Identifier getTexture(KnifeEntity entity) {
-        //noinspection deprecation
         return SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE;
     }
 }
