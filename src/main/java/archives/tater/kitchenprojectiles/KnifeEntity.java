@@ -23,8 +23,6 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import vectorwing.farmersdelight.common.item.KnifeItem;
 import vectorwing.farmersdelight.common.item.enchantment.BackstabbingEnchantment;
-import vectorwing.farmersdelight.common.registry.ModEnchantments;
-import vectorwing.farmersdelight.common.registry.ModItems;
 
 public class KnifeEntity extends PersistentProjectileEntity {
     private static final TrackedData<Byte> LOYALTY = DataTracker.registerData(KnifeEntity.class, TrackedDataHandlerRegistry.BYTE);
@@ -61,7 +59,7 @@ public class KnifeEntity extends PersistentProjectileEntity {
         super.initDataTracker();
         dataTracker.startTracking(LOYALTY, (byte)0);
         dataTracker.startTracking(ENCHANTED, false);
-        dataTracker.startTracking(KNIFE_STACK, ModItems.IRON_KNIFE.get().getDefaultStack());
+        dataTracker.startTracking(KNIFE_STACK, KitchenProjectiles.IRON_KNIFE.get().getDefaultStack());
         dataTracker.startTracking(SIMULATED, false);
     }
 
@@ -137,7 +135,7 @@ public class KnifeEntity extends PersistentProjectileEntity {
                 + (getKnifeStack().getItem() instanceof KnifeItem knifeItem ? knifeItem.getAttackDamage() : 0)
                 + (entity instanceof LivingEntity livingEntity ? EnchantmentHelper.getAttackDamage(getKnifeStack(), livingEntity.getGroup()) : 0));
 
-        var backstabbingLevel = EnchantmentHelper.getLevel(ModEnchantments.BACKSTABBING.get(), getKnifeStack());
+        var backstabbingLevel = EnchantmentHelper.getLevel(KitchenProjectiles.BACKSTABBING.get(), getKnifeStack());
         if (backstabbingLevel > 0 && entity instanceof LivingEntity livingEntity && BackstabbingEnchantment.isLookingBehindTarget(livingEntity, getPos())) {
             damage = BackstabbingEnchantment.getBackstabbingDamagePerLevel(damage, backstabbingLevel);
         }

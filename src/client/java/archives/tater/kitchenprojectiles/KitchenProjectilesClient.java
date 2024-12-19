@@ -40,9 +40,6 @@ public class KitchenProjectilesClient implements ClientModInitializer {
 			context.addModels(knives.values());
 
 			context.modifyModelBeforeBake().register((unbakedModel, context1) -> {
-				if (context1.id().toString().contains("iron_knife")) {
-					System.out.println();
-				}
 				for (var modelId : knives.keySet()) {
 					if (!modelId.equals(context1.id())) continue;
 					if (!(unbakedModel instanceof JsonUnbakedModel jsonUnbakedModel)) break;

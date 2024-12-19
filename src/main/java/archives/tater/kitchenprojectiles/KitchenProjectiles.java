@@ -2,10 +2,13 @@ package archives.tater.kitchenprojectiles;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
+import net.minecraft.block.Block;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.damage.DamageType;
+import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
@@ -33,6 +36,10 @@ public class KitchenProjectiles implements ModInitializer {
 	);
 
 	public static final RegistryKey<DamageType> KNIFE_DAMAGE = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, new Identifier(MOD_ID, "knife"));
+
+	public static RegistryGetter<Block> CUTTING_BOARD = new RegistryGetter<>(Registries.BLOCK, new Identifier("farmersdelight", "cutting_board"));
+	public static RegistryGetter<Item> IRON_KNIFE = new RegistryGetter<>(Registries.ITEM, new Identifier("farmersdelight", "iron_knife"));
+	public static RegistryGetter<Enchantment> BACKSTABBING = new RegistryGetter<>(Registries.ENCHANTMENT, new Identifier("farmersdelight", "backstabbing"));
 
 	@Override
 	public void onInitialize() {
