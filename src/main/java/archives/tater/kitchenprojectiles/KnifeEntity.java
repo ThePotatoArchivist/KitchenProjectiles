@@ -182,7 +182,7 @@ public class KnifeEntity extends PersistentProjectileEntity {
     }
 
     private static boolean insertStack(PlayerInventory playerInventory, int slot, ItemStack stack) {
-        if (playerInventory.getStack(slot).isEmpty()) {
+        if (slot >= 0 && playerInventory.getStack(slot).isEmpty()) {
             playerInventory.setStack(slot, stack);
             return true;
         }
