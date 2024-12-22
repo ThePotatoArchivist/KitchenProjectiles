@@ -57,7 +57,7 @@ public abstract class KnifeItemMixin extends Item {
 			var multishot = EnchantmentHelper.getLevel(Enchantments.MULTISHOT, stack) > 0;
 
 			for (var i = multishot ? -1 : 0; i <= (multishot ? 1 : 0); i++) {
-				var knifeEntity = new KnifeEntity(world, playerEntity, stack.copy(), i != 0);
+				var knifeEntity = new KnifeEntity(world, playerEntity, stack, i != 0);
 				knifeEntity.setVelocity(playerEntity, playerEntity.getPitch(), playerEntity.getYaw() + i * 15, 0.0F, 1.5f, 1.0F);
 				if (playerEntity.getAbilities().creativeMode || i != 0) {
 					knifeEntity.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
@@ -70,7 +70,7 @@ public abstract class KnifeItemMixin extends Item {
 		}
 
 		if (!playerEntity.getAbilities().creativeMode)
-			stack.decrement(1);
+			playerEntity.getInventory().removeOne(stack);
 
 		playerEntity.incrementStat(Stats.USED.getOrCreateStat(this));
 	}
