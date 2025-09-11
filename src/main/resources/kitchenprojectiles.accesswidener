@@ -1,5 +1,1 @@
 accessWidener v1 named
-
-accessible method net/minecraft/enchantment/EnchantmentHelper forEachEnchantment (Lnet/minecraft/item/ItemStack;Lnet/minecraft/enchantment/EnchantmentHelper$Consumer;)V
-accessible class net/minecraft/enchantment/EnchantmentHelper$Consumer
-accessible method net/minecraft/enchantment/Enchantment modifyValue (Lnet/minecraft/component/ComponentType;Lnet/minecraft/server/world/ServerWorld;ILnet/minecraft/item/ItemStack;Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/damage/DamageSource;Lorg/apache/commons/lang3/mutable/MutableFloat;)V
