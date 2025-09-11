@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.8-SNAPSHOT'
+	id 'fabric-loom' version '1.10-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -36,6 +36,10 @@ repositories {
     maven {
         name "ladysnakeReleases"
         url "https://maven.ladysnake.org/releases"
+    }
+    maven {
+        name "upcraftReleases"
+        url "https://maven.uuid.gg/releases"
     }
     maven {
         name = 'TerraformersMC'
