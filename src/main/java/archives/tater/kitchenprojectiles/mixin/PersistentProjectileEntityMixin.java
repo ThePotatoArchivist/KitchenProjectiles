@@ -18,7 +18,7 @@ public abstract class PersistentProjectileEntityMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/projectile/PersistentProjectileEntity;isRemoved()Z")
     )
     private boolean hideNoClip(boolean value) {
-        return (!((Object) this instanceof KnifeEntity knifeEntity) || knifeEntity.hasDealtDamage()) && value;
+        return value && (!((Object) this instanceof KnifeEntity knifeEntity) || knifeEntity.hasDealtDamage());
     }
 
     @ModifyVariable(
