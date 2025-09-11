@@ -32,7 +32,8 @@ import vectorwing.farmersdelight.common.registry.ModItems;
 public class KnifeEntity extends PersistentProjectileEntity {
     private static final TrackedData<Byte> LOYALTY = DataTracker.registerData(KnifeEntity.class, TrackedDataHandlerRegistry.BYTE);
     private static final TrackedData<ItemStack> TRACKED_STACK = DataTracker.registerData(KnifeEntity.class, TrackedDataHandlerRegistry.ITEM_STACK);
-    private boolean dealtDamage;
+    private static final TrackedData<Boolean> DEALT_DAMAGE = DataTracker.registerData(KnifeEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private boolean hasHit;
     private int slot = -1;
     public int returnTimer;
 
@@ -55,21 +56,34 @@ public class KnifeEntity extends PersistentProjectileEntity {
         }
     }
 
-    private void updateLoyalty() {
-        dataTracker.set(LOYALTY, getWorld() instanceof ServerWorld serverWorld ? (byte) EnchantmentHelper.getTridentReturnAcceleration(serverWorld, getItemStack(), getOwner()) : 0);
-    }
-
     @Override
     protected void initDataTracker(DataTracker.Builder builder) {
         super.initDataTracker(builder);
         builder.add(LOYALTY, (byte)0);
         builder.add(TRACKED_STACK, getDefaultItemStack());
+        builder.add(DEALT_DAMAGE, false);
     }
 
     @Override
     public void onTrackedDataSet(TrackedData<?> data) {
         if (data == TRACKED_STACK)
             setSound(getHitSound());
+    }
+
+    public boolean hasDealtDamage() {
+        return dataTracker.get(DEALT_DAMAGE);
+    }
+
+    private void setDealtDamage(boolean dealtDamage) {
+        dataTracker.set(DEALT_DAMAGE, dealtDamage);
+    }
+
+    private void updateLoyalty() {
+        dataTracker.set(LOYALTY, getWorld() instanceof ServerWorld serverWorld ? (byte) EnchantmentHelper.getTridentReturnAcceleration(serverWorld, getItemStack(), getOwner()) : 0);
+    }
+
+    private int getLoyalty() {
+        return dataTracker.get(LOYALTY);
     }
 
     public boolean isIntangible() {
@@ -80,12 +94,14 @@ public class KnifeEntity extends PersistentProjectileEntity {
     @Override
     public void tick() {
         if (inGroundTime > 4) {
-            dealtDamage = true;
+            hasHit = true;
+            if (!EnchantmentHelper.hasAnyEnchantmentsWith(getStackClient(), ModDataComponents.BACKSTABBING.get()))
+                setDealtDamage(true);
         }
 
         Entity entity = getOwner();
-        var loyaltyLevel = dataTracker.get(LOYALTY);
-        if (loyaltyLevel > 0 && !isIntangible() && (dealtDamage || isNoClip()) && entity != null) {
+        var loyaltyLevel = getLoyalty();
+        if (loyaltyLevel > 0 && !isIntangible() && (hasHit || isNoClip()) && entity != null) {
             if (!isOwnerAlive()) {
                 if (!getWorld().isClient && pickupType == PersistentProjectileEntity.PickupPermission.ALLOWED) {
                     dropStack(asItemStack(), 0.1F);
@@ -137,7 +153,7 @@ public class KnifeEntity extends PersistentProjectileEntity {
     @Nullable
     @Override
     protected EntityHitResult getEntityCollision(Vec3d currentPosition, Vec3d nextPosition) {
-        return dealtDamage ? null : super.getEntityCollision(currentPosition, nextPosition);
+        return hasDealtDamage() ? null : super.getEntityCollision(currentPosition, nextPosition);
     }
 
     @Override
@@ -161,7 +177,8 @@ public class KnifeEntity extends PersistentProjectileEntity {
             }
         }
 
-        dealtDamage = true;
+        hasHit = true;
+        setDealtDamage(true);
         if (entity.damage(damageSource, damage)) {
             if (entity.getType() == EntityType.ENDERMAN) {
                 return;
@@ -227,7 +244,8 @@ public class KnifeEntity extends PersistentProjectileEntity {
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
-        dealtDamage = nbt.getBoolean("DealtDamage");
+        hasHit = nbt.getBoolean("HasHit");
+        setDealtDamage(nbt.getBoolean("DealtDamage"));
         updateLoyalty();
         slot = nbt.getInt("Slot");
     }
@@ -235,7 +253,8 @@ public class KnifeEntity extends PersistentProjectileEntity {
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
-        nbt.putBoolean("DealtDamage", dealtDamage);
+        nbt.putBoolean("HasHit", hasHit);
+        nbt.putBoolean("DealtDamage", hasDealtDamage());
         nbt.putInt("Slot", slot);
     }
 
@@ -258,9 +277,9 @@ public class KnifeEntity extends PersistentProjectileEntity {
 
     @Override
     protected void tickInVoid() {
-        if (dataTracker.get(LOYALTY) <= 0) super.tickInVoid();
-        if (!dealtDamage) {
-            dealtDamage = true;
+        if (getLoyalty() <= 0) super.tickInVoid();
+        if (!hasHit) {
+            hasHit = true;
             setVelocity(0, 0, 0);
         }
     }

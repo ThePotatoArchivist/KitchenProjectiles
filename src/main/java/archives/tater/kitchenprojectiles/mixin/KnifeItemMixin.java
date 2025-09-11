@@ -62,7 +62,7 @@ public abstract class KnifeItemMixin extends Item {
             var spread = EnchantmentHelper.getProjectileSpread(serverWorld, stack, user, 0f);
 
 			for (var i = 0; i < multishot; i++) {
-                var projectileStack = stack.copy();
+                var projectileStack = i == 0 ? stack : stack.copy();
                 if (i != 0)
                     projectileStack.set(DataComponentTypes.INTANGIBLE_PROJECTILE, Unit.INSTANCE);
 

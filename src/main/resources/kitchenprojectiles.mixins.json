@@ -3,7 +3,8 @@
   "package": "archives.tater.kitchenprojectiles.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "KnifeItemMixin"
+    "KnifeItemMixin",
+    "PersistentProjectileEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1
