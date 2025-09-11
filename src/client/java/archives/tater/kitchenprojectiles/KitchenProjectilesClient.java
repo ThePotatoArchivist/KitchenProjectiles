@@ -8,13 +8,14 @@ import net.minecraft.client.render.model.json.JsonUnbakedModel;
 import net.minecraft.client.render.model.json.ModelOverride;
 import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.util.Identifier;
+import vectorwing.farmersdelight.FarmersDelight;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class KitchenProjectilesClient implements ClientModInitializer {
-	public static final Identifier THROWING_PREDICATE = new Identifier(KitchenProjectiles.MOD_ID, "throwing");
+	public static final Identifier THROWING_PREDICATE = KitchenProjectiles.id("throwing");
 
 	@Override
 	public void onInitializeClient() {
@@ -32,19 +33,16 @@ public class KitchenProjectilesClient implements ClientModInitializer {
 				"golden",
 				"netherite"
 		).collect(Collectors.toMap(
-				prefix -> new ModelIdentifier("farmersdelight", prefix + "_knife", "inventory"),
-				prefix -> new Identifier(KitchenProjectiles.MOD_ID, "item/" + prefix + "_knife_throwing")
+				prefix -> new ModelIdentifier(Identifier.of(FarmersDelight.MODID, prefix + "_knife"), "inventory"),
+				prefix -> KitchenProjectiles.id("item/" + prefix + "_knife_throwing")
 		));
 
 		ModelLoadingPlugin.register(context -> {
 			context.addModels(knives.values());
 
 			context.modifyModelBeforeBake().register((unbakedModel, context1) -> {
-				if (context1.id().toString().contains("iron_knife")) {
-					System.out.println();
-				}
 				for (var modelId : knives.keySet()) {
-					if (!modelId.equals(context1.id())) continue;
+					if (!modelId.equals(context1.topLevelId())) continue;
 					if (!(unbakedModel instanceof JsonUnbakedModel jsonUnbakedModel)) break;
 
 					jsonUnbakedModel.getOverrides().add(new ModelOverride(

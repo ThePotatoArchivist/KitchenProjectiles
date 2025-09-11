@@ -29,9 +29,10 @@
 			"environment": "client"
 		}
 	],
+    "accessWidener": "kitchenprojectiles.accesswidener",
 	"depends": {
 		"fabricloader": ">=0.16.9",
-		"minecraft": "~1.20.1",
+		"minecraft": "~1.21",
 		"java": ">=17",
 		"fabric-api": "*",
 		"farmersdelight": ">=1.20.1-2.2.4"

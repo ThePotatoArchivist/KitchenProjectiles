@@ -1,6 +1,5 @@
 package archives.tater.kitchenprojectiles;
 
-import net.fabricmc.yarn.constants.MiningLevels;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ToolItem;
 import net.minecraft.registry.Registries;
@@ -14,7 +13,7 @@ public class KitchenProjectilesSounds {
     }
 
     private static SoundEvent of(String path) {
-        return of(new Identifier(KitchenProjectiles.MOD_ID, path));
+        return of(KitchenProjectiles.id(path));
     }
 
     public static final SoundEvent KNIFE_THROW_LIGHT = of("entity.kitchenprojectiles.knife.light.throw");
@@ -27,7 +26,7 @@ public class KitchenProjectilesSounds {
     public static final SoundEvent KNIFE_RETURN_HEAVY = of("entity.kitchenprojectiles.knife.heavy.return");
 
     public static boolean isKnifeHeavy(ItemStack knifeStack) {
-        return knifeStack.getItem() instanceof ToolItem toolItem && toolItem.getMaterial().getMiningLevel() >= MiningLevels.DIAMOND;
+        return knifeStack.getItem() instanceof ToolItem toolItem && toolItem.getMaterial().getAttackDamage() >= 3; // yeah a bit hacky
     }
 
     public static SoundEvent throwing(ItemStack knifeStack) {

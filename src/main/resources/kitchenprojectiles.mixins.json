@@ -3,9 +3,7 @@
   "package": "archives.tater.kitchenprojectiles.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "KnifeItemMixin",
-    "LoyaltyEnchantmentMixin",
-    "MultishotEnchantmentMixin"
+    "KnifeItemMixin"
   ],
   "injectors": {
     "defaultRequire": 1

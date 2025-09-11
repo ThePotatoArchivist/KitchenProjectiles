@@ -1,8 +1,9 @@
 package archives.tater.kitchenprojectiles;
 
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
-import net.minecraft.entity.EntityDimensions;
+import net.fabricmc.fabric.api.item.v1.EnchantmentEvents;
+import net.fabricmc.fabric.api.util.TriState;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.damage.DamageType;
@@ -13,6 +14,7 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vectorwing.farmersdelight.common.item.KnifeItem;
 
 public class KitchenProjectiles implements ModInitializer {
 	public static final String MOD_ID = "kitchenprojectiles";
@@ -22,17 +24,21 @@ public class KitchenProjectiles implements ModInitializer {
 	// That way, it's clear which mod wrote info, warnings, and errors.
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
+    public static Identifier id(String path) {
+        return Identifier.of(MOD_ID, path);
+    }
+
 	public static final EntityType<KnifeEntity> KNIFE_ENTITY = Registry.register(
 			Registries.ENTITY_TYPE,
-			new Identifier(MOD_ID, "knife"),
-			FabricEntityTypeBuilder.<KnifeEntity>create(SpawnGroup.MISC, KnifeEntity::new)
-					.dimensions(EntityDimensions.fixed(0.4f, 0.4f))
-					.trackRangeChunks(4)
-					.trackedUpdateRate(20)
+			id("knife"),
+			EntityType.Builder.<KnifeEntity>create(KnifeEntity::new, SpawnGroup.MISC)
+					.dimensions(0.4f, 0.4f)
+					.maxTrackingRange(4)
+					.trackingTickInterval(20)
 					.build()
 	);
 
-	public static final RegistryKey<DamageType> KNIFE_DAMAGE = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, new Identifier(MOD_ID, "knife"));
+	public static final RegistryKey<DamageType> KNIFE_DAMAGE = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, id("knife"));
 
 	@Override
 	public void onInitialize() {
@@ -40,5 +46,12 @@ public class KitchenProjectiles implements ModInitializer {
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 		KitchenProjectilesSounds.init();
+
+        EnchantmentEvents.ALLOW_ENCHANTING.register((enchantment, target, enchantingContext) ->
+            target.getItem() instanceof KnifeItem &&
+                    enchantment.getKey().map(key -> key == Enchantments.LOYALTY || key == Enchantments.MULTISHOT).orElse(false)
+                    ? TriState.TRUE
+                    : TriState.DEFAULT
+        );
 	}
 }

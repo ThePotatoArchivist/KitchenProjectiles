@@ -3,19 +3,21 @@ package archives.tater.kitchenprojectiles.mixin;
 import archives.tater.kitchenprojectiles.KitchenProjectilesSounds;
 import archives.tater.kitchenprojectiles.KnifeEntity;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.stat.Stats;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.UseAction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
+import org.joml.Quaternionf;
 import org.spongepowered.asm.mixin.Mixin;
 import vectorwing.farmersdelight.common.item.KnifeItem;
 import vectorwing.farmersdelight.common.registry.ModBlocks;
@@ -36,12 +38,12 @@ public abstract class KnifeItemMixin extends Item {
 		return TypedActionResult.consume(stack);
 	}
 
-	@Override
-	public int getMaxUseTime(ItemStack stack) {
-		return 72000;
-	}
+    @Override
+    public int getMaxUseTime(ItemStack stack, LivingEntity user) {
+        return 72000;
+    }
 
-	@Override
+    @Override
 	public UseAction getUseAction(ItemStack stack) {
 		return UseAction.SPEAR;
 	}
@@ -49,16 +51,28 @@ public abstract class KnifeItemMixin extends Item {
 	@Override
 	public void onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
 		if (!(user instanceof PlayerEntity playerEntity)) return;
-        if (getMaxUseTime(stack) - remainingUseTicks < 6) return;
+        if (user.getItemUseTime() < 6) return;
 
-		if (!world.isClient) {
-			stack.damage(1, user, p -> p.sendToolBreakStatus(user.getActiveHand()));
+		if (world instanceof ServerWorld serverWorld) {
+            stack.damage(1, user, LivingEntity.getSlotForHand(user.getActiveHand()));
 
-			var multishot = EnchantmentHelper.getLevel(Enchantments.MULTISHOT, stack) > 0;
+			var multishot = EnchantmentHelper.getProjectileCount(serverWorld, stack, user, 1);
+            var spread = EnchantmentHelper.getProjectileSpread(serverWorld, stack, user, 0f);
 
-			for (var i = multishot ? -1 : 0; i <= (multishot ? 1 : 0); i++) {
+			for (var i = 0; i < multishot; i++) {
 				var knifeEntity = new KnifeEntity(world, playerEntity, stack.copy(), i != 0);
-				knifeEntity.setVelocity(playerEntity, playerEntity.getPitch(), playerEntity.getYaw() + i * 15, 0.0F, 1.5f, 1.0F);
+
+                var spreadIndex = (2 * (i % 2) - 1) * (i + 1) / 2; // 0, 1, -1, 2, -2, etc.
+
+                var yaw = spread * spreadIndex;
+
+                var opposite = user.getOppositeRotationVector(1f);
+                var quaternion = new Quaternionf().setAngleAxis(yaw * MathHelper.RADIANS_PER_DEGREE, opposite.x, opposite.y, opposite.z);
+                var rotation = user.getRotationVec(1f);
+                var velocity = rotation.toVector3f().rotate(quaternion);
+
+                knifeEntity.setVelocity(velocity.x, velocity.y, velocity.z, 1.5f, 1f);
+
 				if (playerEntity.getAbilities().creativeMode || i != 0) {
 					knifeEntity.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
 				}
