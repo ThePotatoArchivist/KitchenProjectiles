@@ -1,14 +1,16 @@
 package archives.tater.kitchenprojectiles;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.model.loading.v1.ExtraModelKey;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
+import net.fabricmc.fabric.api.client.model.loading.v1.SimpleUnbakedExtraModel;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
-import net.minecraft.client.item.ModelPredicateProviderRegistry;
-import net.minecraft.client.render.model.json.JsonUnbakedModel;
-import net.minecraft.client.render.model.json.ModelOverride;
-import net.minecraft.client.util.ModelIdentifier;
+import net.minecraft.client.render.item.model.BasicItemModel;
+import net.minecraft.client.render.item.model.ConditionItemModel;
+import net.minecraft.client.render.item.property.bool.UsingItemProperty;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
-import vectorwing.farmersdelight.FarmersDelight;
+import vectorwing.farmersdelight.common.registry.ModItems;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,37 +24,33 @@ public class KitchenProjectilesClient implements ClientModInitializer {
 		// This entrypoint is suitable for setting up client-specific logic, such as rendering.
 		EntityRendererRegistry.register(KitchenProjectiles.KNIFE_ENTITY, KnifeEntityRenderer::new);
 
-		ModelPredicateProviderRegistry.register(THROWING_PREDICATE, (stack, world, entity, seed) ->
-				entity != null && entity.isUsingItem() && entity.getActiveItem() == stack ? 1.0F : 0.0F
-		);
-
 		var knives = Stream.of(
-				"flint",
-				"iron",
-				"diamond",
-				"golden",
-				"netherite"
-		).collect(Collectors.toMap(
-				prefix -> new ModelIdentifier(Identifier.of(FarmersDelight.MODID, prefix + "_knife"), "inventory"),
-				prefix -> KitchenProjectiles.id("item/" + prefix + "_knife_throwing")
+                ModItems.FLINT_KNIFE.get(),
+                ModItems.IRON_KNIFE.get(),
+                ModItems.GOLDEN_KNIFE.get(),
+                ModItems.DIAMOND_KNIFE.get(),
+                ModItems.NETHERITE_KNIFE.get()
+		).map(Registries.ITEM::getId).collect(Collectors.toMap(
+				itemId -> itemId,
+				itemId -> KitchenProjectiles.id("item/" + itemId.getPath() + "_throwing")
 		));
 
 		ModelLoadingPlugin.register(context -> {
-			context.addModels(knives.values());
+            for (var modelId : knives.values()) {
+                context.addModel(ExtraModelKey.create(), SimpleUnbakedExtraModel.blockStateModel(modelId));
+            }
 
-			context.modifyModelBeforeBake().register((unbakedModel, context1) -> {
-				for (var modelId : knives.keySet()) {
-					if (!modelId.equals(context1.topLevelId())) continue;
-					if (!(unbakedModel instanceof JsonUnbakedModel jsonUnbakedModel)) break;
+            context.modifyItemModelBeforeBake().register((unbaked, context1) -> {
+                for (var pair : knives.entrySet()) {
+                    var itemId = pair.getKey();
+                    var modelId = pair.getValue();
 
-					jsonUnbakedModel.getOverrides().add(new ModelOverride(
-							knives.get(modelId),
-							List.of(new ModelOverride.Condition(THROWING_PREDICATE, 1))));
+                    if (!itemId.equals(context1.itemId())) continue;
 
-					break;
-				}
-				return unbakedModel;
-			});
+                    return new ConditionItemModel.Unbaked(new UsingItemProperty(), new BasicItemModel.Unbaked(modelId, List.of()), unbaked);
+                }
+                return unbaked;
+            });
 		});
 	}
 }

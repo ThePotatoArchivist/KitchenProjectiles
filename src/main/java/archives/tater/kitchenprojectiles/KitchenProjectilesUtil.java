@@ -14,10 +14,10 @@ public class KitchenProjectilesUtil {
     private KitchenProjectilesUtil() {}
 
     public static float getDamage(ItemStack stack, DamageSource source, World world, Entity target) {
-        var instance = new EntityAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE, ignored -> {});
+        var instance = new EntityAttributeInstance(EntityAttributes.ATTACK_DAMAGE, ignored -> {});
         instance.setBaseValue(1.0);
         stack.applyAttributeModifiers(EquipmentSlot.MAINHAND, (attribute, modifier) -> {
-            if (attribute == EntityAttributes.GENERIC_ATTACK_DAMAGE)
+            if (attribute == EntityAttributes.ATTACK_DAMAGE)
                 instance.addTemporaryModifier(modifier);
         });
 

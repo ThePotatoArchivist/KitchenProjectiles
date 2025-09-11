@@ -9,13 +9,13 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.consume.UseAction;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.stat.Stats;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.Unit;
-import net.minecraft.util.UseAction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
@@ -31,13 +31,15 @@ public abstract class KnifeItemMixin extends Item {
 		super(settings);
 	}
 
+
+
 	@Override
-	public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+	public ActionResult use(World world, PlayerEntity user, Hand hand) {
 		var stack = user.getStackInHand(hand);
 		if (stack.getMaxDamage() - stack.getDamage() <= 1 || world.getBlockState(raycast(world, user, RaycastContext.FluidHandling.NONE).getBlockPos()).isOf(ModBlocks.CUTTING_BOARD.get()))
-			return TypedActionResult.pass(stack);
+			return ActionResult.PASS;
 		user.setCurrentHand(hand);
-		return TypedActionResult.consume(stack);
+		return ActionResult.CONSUME;
 	}
 
     @Override
@@ -51,9 +53,9 @@ public abstract class KnifeItemMixin extends Item {
 	}
 
 	@Override
-	public void onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
-		if (!(user instanceof PlayerEntity playerEntity)) return;
-        if (user.getItemUseTime() < 6) return;
+	public boolean onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
+		if (!(user instanceof PlayerEntity playerEntity)) return false;
+        if (user.getItemUseTime() < 6) return false;
 
 		if (world instanceof ServerWorld serverWorld) {
             stack.damage(1, user, LivingEntity.getSlotForHand(user.getActiveHand()));
@@ -93,5 +95,6 @@ public abstract class KnifeItemMixin extends Item {
 			stack.decrement(1);
 
 		playerEntity.incrementStat(Stats.USED.getOrCreateStat(this));
-	}
+        return true;
+    }
 }

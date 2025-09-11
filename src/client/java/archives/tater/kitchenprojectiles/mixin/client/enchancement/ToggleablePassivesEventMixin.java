@@ -1,6 +1,6 @@
 package archives.tater.kitchenprojectiles.mixin.client.enchancement;
 
-import moriyashiine.enchancement.client.event.ToggleablePassivesEvent;
+import moriyashiine.enchancement.client.event.config.ToggleablePassivesEvent;
 import net.minecraft.item.Item;
 import net.minecraft.registry.tag.TagKey;
 import org.spongepowered.asm.mixin.Final;

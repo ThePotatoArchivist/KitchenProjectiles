@@ -12,12 +12,13 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
@@ -103,8 +104,8 @@ public class KnifeEntity extends PersistentProjectileEntity {
         var loyaltyLevel = getLoyalty();
         if (loyaltyLevel > 0 && !isIntangible() && (hasHit || isNoClip()) && entity != null) {
             if (!isOwnerAlive()) {
-                if (!getWorld().isClient && pickupType == PersistentProjectileEntity.PickupPermission.ALLOWED) {
-                    dropStack(asItemStack(), 0.1F);
+                if (getWorld() instanceof ServerWorld serverWorld && pickupType == PersistentProjectileEntity.PickupPermission.ALLOWED) {
+                    dropStack(serverWorld, asItemStack(), 0.1F);
                 }
 
                 discard();
@@ -184,7 +185,7 @@ public class KnifeEntity extends PersistentProjectileEntity {
 
         hasHit = true;
         setDealtDamage(true);
-        if (entity.damage(damageSource, damage)) {
+        if (entity.sidedDamage(damageSource, damage)) {
             if (entity.getType() == EntityType.ENDERMAN) {
                 return;
             }
@@ -212,7 +213,12 @@ public class KnifeEntity extends PersistentProjectileEntity {
                 null,
                 blockHitResult.getBlockPos().clampToWithin(blockHitResult.getPos()),
                 world.getBlockState(blockHitResult.getBlockPos()),
-                item -> kill());
+                item -> kill(world));
+    }
+
+    @Override
+    public ItemStack getWeaponStack() {
+        return getItemStack();
     }
 
     @Override
@@ -247,20 +253,20 @@ public class KnifeEntity extends PersistentProjectileEntity {
     }
 
     @Override
-    public void readCustomDataFromNbt(NbtCompound nbt) {
-        super.readCustomDataFromNbt(nbt);
-        hasHit = nbt.getBoolean("HasHit");
-        setDealtDamage(nbt.getBoolean("DealtDamage"));
+    protected void readCustomData(ReadView view) {
+        super.readCustomData(view);
+        hasHit = view.getBoolean("HasHit", false);
+        setDealtDamage(view.getBoolean("DealtDamage", false));
         updateLoyalty();
-        slot = nbt.getInt("Slot");
+        slot = view.getInt("Slot", -1);
     }
 
     @Override
-    public void writeCustomDataToNbt(NbtCompound nbt) {
-        super.writeCustomDataToNbt(nbt);
-        nbt.putBoolean("HasHit", hasHit);
-        nbt.putBoolean("DealtDamage", hasDealtDamage());
-        nbt.putInt("Slot", slot);
+    protected void writeCustomData(WriteView view) {
+        super.writeCustomData(view);
+        view.putBoolean("HasHit", hasHit);
+        view.putBoolean("DealtDamage", hasDealtDamage());
+        view.putInt("Slot", slot);
     }
 
     @Override

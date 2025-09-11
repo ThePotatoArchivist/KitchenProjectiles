@@ -2,23 +2,22 @@ package archives.tater.kitchenprojectiles;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.item.ItemModelManager;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.render.item.ItemRenderer;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
-import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.render.entity.state.ProjectileEntityRenderState;
+import net.minecraft.client.render.item.ItemRenderState;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
+import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 
 @Environment(EnvType.CLIENT)
-public class KnifeEntityRenderer extends EntityRenderer<KnifeEntity> {
+public class KnifeEntityRenderer extends EntityRenderer<KnifeEntity, KnifeEntityRenderer.KnifeEntityRenderState> {
     private static final float MIN_DISTANCE = 3.5f * 3.5f;
-    private final ItemRenderer itemRenderer;
+    private final ItemModelManager itemModelManager;
     private final float scale;
     private final boolean lit;
 
@@ -26,7 +25,7 @@ public class KnifeEntityRenderer extends EntityRenderer<KnifeEntity> {
 
     public KnifeEntityRenderer(EntityRendererFactory.Context ctx, float scale, boolean lit) {
         super(ctx);
-        this.itemRenderer = ctx.getItemRenderer();
+        this.itemModelManager = ctx.getItemModelManager();
         this.scale = scale;
         this.lit = lit;
     }
@@ -41,35 +40,50 @@ public class KnifeEntityRenderer extends EntityRenderer<KnifeEntity> {
     }
 
     @Override
-    public void render(KnifeEntity entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
-        if (entity.age < 2 && dispatcher.camera.getFocusedEntity().squaredDistanceTo(entity) < MIN_DISTANCE) return;
+    public KnifeEntityRenderState createRenderState() {
+        return new KnifeEntityRenderState();
+    }
+
+    @Override
+    public void updateRenderState(KnifeEntity entity, KnifeEntityRenderState state, float tickProgress) {
+        super.updateRenderState(entity, state, tickProgress);
+
+        // see ProjectileEntityRenderer#updateRenderState
+        state.pitch = entity.getLerpedPitch(tickProgress);
+        state.yaw = entity.getLerpedYaw(tickProgress);
+        state.shake = entity.shake - tickProgress;
+
+        state.intangible = entity.isIntangible();
+        itemModelManager.updateForNonLivingEntity(state.knifeRenderState, entity.getStackClient(), ItemDisplayContext.NONE, entity);
+    }
+
+    @Override
+    public void render(KnifeEntityRenderState state, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+//        if (state.age < 2 && dispatcher.camera.getFocusedEntity().squaredDistanceTo(state.pos) < MIN_DISTANCE) return;
 
         matrices.push();
         matrices.scale(0.85f * scale, 0.85f * scale, 0.85f * scale);
         matrices.translate(0, -0.1f, 0);
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(MathHelper.lerp(tickDelta, entity.prevYaw, entity.getYaw()) - 90.0F));
-        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(MathHelper.lerp(tickDelta, entity.prevPitch, entity.getPitch()) + 90.0F));
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(state.yaw - 90.0F));
+        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(state.pitch + 90.0F));
         matrices.translate(scale * 0.2, scale * 0.1, 0);
         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-45));
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180));
 
-        if (entity.isIntangible())
+        if (state.intangible)
             intangible = true;
 
-        itemRenderer.renderItem(
-                entity.getStackClient(), ModelTransformationMode.NONE, light, OverlayTexture.DEFAULT_UV, matrices, vertexConsumers, entity.getWorld(), entity.getId()
-        );
+        state.knifeRenderState.render(matrices, vertexConsumers, light, OverlayTexture.DEFAULT_UV);
 
         intangible = false;
 
         matrices.pop();
 
-        super.render(entity, yaw, tickDelta, matrices, vertexConsumers, light);
+        super.render(state, matrices, vertexConsumers, light);
     }
 
-    @Override
-    @SuppressWarnings("deprecation")
-    public Identifier getTexture(KnifeEntity entity) {
-        return SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE;
+    public static class KnifeEntityRenderState extends ProjectileEntityRenderState {
+        public boolean intangible;
+        public ItemRenderState knifeRenderState = new ItemRenderState();
     }
 }

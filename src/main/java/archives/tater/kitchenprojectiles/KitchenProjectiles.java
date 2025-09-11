@@ -4,6 +4,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.item.v1.EnchantmentEvents;
 import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.damage.DamageType;
@@ -30,14 +31,17 @@ public class KitchenProjectiles implements ModInitializer {
         return Identifier.of(MOD_ID, path);
     }
 
-	public static final EntityType<KnifeEntity> KNIFE_ENTITY = Registry.register(
-			Registries.ENTITY_TYPE,
+    private static <T extends Entity> EntityType<T> register(Identifier id, EntityType.Builder<T> type) {
+        var key = RegistryKey.of(RegistryKeys.ENTITY_TYPE, id);
+        return Registry.register(Registries.ENTITY_TYPE, key, type.build(key));
+    }
+
+	public static final EntityType<KnifeEntity> KNIFE_ENTITY = register(
 			id("knife"),
 			EntityType.Builder.<KnifeEntity>create(KnifeEntity::new, SpawnGroup.MISC)
 					.dimensions(0.4f, 0.4f)
 					.maxTrackingRange(4)
 					.trackingTickInterval(20)
-					.build()
 	);
 
 	public static final RegistryKey<DamageType> KNIFE_DAMAGE = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, id("knife"));

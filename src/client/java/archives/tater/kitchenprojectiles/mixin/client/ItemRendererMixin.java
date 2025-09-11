@@ -13,11 +13,11 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 @Mixin(ItemRenderer.class)
 public class ItemRendererMixin {
     @ModifyArg(
-            method = "renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformationMode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/render/model/BakedModel;)V",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/item/ItemRenderer;renderBakedItemModel(Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/item/ItemStack;IILnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;)V"),
-            index = 5
+            method = "renderItem(Lnet/minecraft/item/ItemDisplayContext;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;II[ILjava/util/List;Lnet/minecraft/client/render/RenderLayer;Lnet/minecraft/client/render/item/ItemRenderState$Glint;)V",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/item/ItemRenderer;renderBakedItemQuads(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;Ljava/util/List;[III)V"),
+            index = 1
     )
-    private VertexConsumer intangibleTranslucent(VertexConsumer vertices, @Local(argsOnly = true) VertexConsumerProvider vertexConsumers) {
+    private static VertexConsumer intangibleTranslucent(VertexConsumer vertices, @Local(argsOnly = true) VertexConsumerProvider vertexConsumers) {
         if (!KnifeEntityRenderer.intangible)
             return vertices;
         return vertexConsumers.getBuffer(TexturedRenderLayers.getItemEntityTranslucentCull());
@@ -28,7 +28,7 @@ public class ItemRendererMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumer;quad(Lnet/minecraft/client/util/math/MatrixStack$Entry;Lnet/minecraft/client/render/model/BakedQuad;FFFFII)V"),
             index = 5
     )
-    private float intangibleTranslucent(float alpha) {
+    private static float intangibleTranslucent(float alpha) {
         if (!KnifeEntityRenderer.intangible)
             return alpha;
         return 0.5f;
