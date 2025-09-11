@@ -31,11 +31,11 @@
 	],
     "accessWidener": "kitchenprojectiles.accesswidener",
 	"depends": {
-		"fabricloader": ">=0.16.9",
+		"fabricloader": ">=0.17.2",
 		"minecraft": "~1.21.6",
-		"java": ">=17",
+		"java": ">=21",
 		"fabric-api": "*",
-		"farmersdelight": ">=1.20.1-2.2.4"
+		"farmersdelight": ">=1.21.8-3.2.4"
 	},
 	"suggests": {
 	}

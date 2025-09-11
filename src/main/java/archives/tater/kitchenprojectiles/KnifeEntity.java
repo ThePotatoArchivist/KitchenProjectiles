@@ -80,7 +80,8 @@ public class KnifeEntity extends PersistentProjectileEntity {
     }
 
     private void updateLoyalty() {
-        dataTracker.set(LOYALTY, getWorld() instanceof ServerWorld serverWorld ? (byte) EnchantmentHelper.getTridentReturnAcceleration(serverWorld, getItemStack(), getOwner()) : 0);
+        var owner = getOwner();
+        dataTracker.set(LOYALTY, owner != null && getWorld() instanceof ServerWorld serverWorld ? (byte) EnchantmentHelper.getTridentReturnAcceleration(serverWorld, getItemStack(), owner) : 0);
     }
 
     private int getLoyalty() {
