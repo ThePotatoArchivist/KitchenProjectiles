@@ -1,5 +1,6 @@
 package archives.tater.kitchenprojectiles.mixin;
 
+import archives.tater.kitchenprojectiles.KitchenProjectiles;
 import archives.tater.kitchenprojectiles.KitchenProjectilesSounds;
 import archives.tater.kitchenprojectiles.KnifeEntity;
 import net.minecraft.component.DataComponentTypes;
@@ -27,7 +28,7 @@ import vectorwing.farmersdelight.common.registry.ModBlocks;
 @Mixin(KnifeItem.class)
 public abstract class KnifeItemMixin extends Item {
 
-	public KnifeItemMixin(Settings settings) {
+    public KnifeItemMixin(Settings settings) {
 		super(settings);
 	}
 
@@ -55,7 +56,7 @@ public abstract class KnifeItemMixin extends Item {
 	@Override
 	public boolean onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
 		if (!(user instanceof PlayerEntity playerEntity)) return false;
-        if (user.getItemUseTime() < 6) return false;
+        if (user.getItemUseTime() < KitchenProjectiles.MIN_USE_DURATION) return false;
 
 		if (world instanceof ServerWorld serverWorld) {
             stack.damage(1, user, LivingEntity.getSlotForHand(user.getActiveHand()));

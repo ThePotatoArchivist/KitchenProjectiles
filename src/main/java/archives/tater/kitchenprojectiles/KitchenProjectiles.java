@@ -31,6 +31,8 @@ public class KitchenProjectiles implements ModInitializer {
         return Identifier.of(MOD_ID, path);
     }
 
+    public static final int MIN_USE_DURATION = 6;
+
     private static <T extends Entity> EntityType<T> register(Identifier id, EntityType.Builder<T> type) {
         var key = RegistryKey.of(RegistryKeys.ENTITY_TYPE, id);
         return Registry.register(Registries.ENTITY_TYPE, key, type.build(key));
