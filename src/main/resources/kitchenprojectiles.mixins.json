@@ -9,7 +9,8 @@
     "enchancement.EnchantmentHelperMixin",
     "enchancement.FrozenComponentMixin",
     "enchancement.LivingEntityMixin",
-    "enchancement.RandomChanceWithEnchantedBonusLootConditionMixin"
+    "enchancement.RandomChanceWithEnchantedBonusLootConditionMixin",
+    "enchancement.RebalanceEquipmentEventMixin"
   ],
   "plugin": "archives.tater.kitchenprojectiles.KitchenProjectilesMixinPlugin",
   "injectors": {
