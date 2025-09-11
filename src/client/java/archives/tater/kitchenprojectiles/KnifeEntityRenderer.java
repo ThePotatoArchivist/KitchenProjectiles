@@ -22,6 +22,8 @@ public class KnifeEntityRenderer extends EntityRenderer<KnifeEntity> {
     private final float scale;
     private final boolean lit;
 
+    public static boolean intangible = false;
+
     public KnifeEntityRenderer(EntityRendererFactory.Context ctx, float scale, boolean lit) {
         super(ctx);
         this.itemRenderer = ctx.getItemRenderer();
@@ -40,20 +42,28 @@ public class KnifeEntityRenderer extends EntityRenderer<KnifeEntity> {
 
     @Override
     public void render(KnifeEntity entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
-        if (entity.age >= 2 || !(dispatcher.camera.getFocusedEntity().squaredDistanceTo(entity) < MIN_DISTANCE)) {
-            matrices.push();
-            matrices.scale(0.85f * scale, 0.85f * scale, 0.85f * scale);
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(MathHelper.lerp(tickDelta, entity.prevYaw, entity.getYaw()) - 90.0F));
-            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(MathHelper.lerp(tickDelta, entity.prevPitch, entity.getPitch()) + 90.0F));
-            matrices.translate(scale * 0.2, scale * 0.1, 0);
-            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-45));
-            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180));
-            itemRenderer.renderItem(
-                    entity.getKnifeStack(), ModelTransformationMode.NONE, light, OverlayTexture.DEFAULT_UV, matrices, vertexConsumers, entity.getWorld(), entity.getId()
-            );
-            matrices.pop();
-            super.render(entity, yaw, tickDelta, matrices, vertexConsumers, light);
-        }
+        if (entity.age < 2 && dispatcher.camera.getFocusedEntity().squaredDistanceTo(entity) < MIN_DISTANCE) return;
+
+        matrices.push();
+        matrices.scale(0.85f * scale, 0.85f * scale, 0.85f * scale);
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(MathHelper.lerp(tickDelta, entity.prevYaw, entity.getYaw()) - 90.0F));
+        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(MathHelper.lerp(tickDelta, entity.prevPitch, entity.getPitch()) + 90.0F));
+        matrices.translate(scale * 0.2, scale * 0.1, 0);
+        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-45));
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180));
+
+        if (entity.isIntangible())
+            intangible = true;
+
+        itemRenderer.renderItem(
+                entity.getStackClient(), ModelTransformationMode.NONE, light, OverlayTexture.DEFAULT_UV, matrices, vertexConsumers, entity.getWorld(), entity.getId()
+        );
+
+        intangible = false;
+
+        matrices.pop();
+
+        super.render(entity, yaw, tickDelta, matrices, vertexConsumers, light);
     }
 
     @Override

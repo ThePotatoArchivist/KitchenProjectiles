@@ -1,5 +1,6 @@
 package archives.tater.kitchenprojectiles;
 
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -30,8 +31,7 @@ import vectorwing.farmersdelight.common.registry.ModItems;
 
 public class KnifeEntity extends PersistentProjectileEntity {
     private static final TrackedData<Byte> LOYALTY = DataTracker.registerData(KnifeEntity.class, TrackedDataHandlerRegistry.BYTE);
-    private static final TrackedData<ItemStack> KNIFE_STACK = DataTracker.registerData(KnifeEntity.class, TrackedDataHandlerRegistry.ITEM_STACK);
-    private static final TrackedData<Boolean> SIMULATED = DataTracker.registerData(KnifeEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final TrackedData<ItemStack> TRACKED_STACK = DataTracker.registerData(KnifeEntity.class, TrackedDataHandlerRegistry.ITEM_STACK);
     private boolean dealtDamage;
     private int slot = -1;
     public int returnTimer;
@@ -40,11 +40,10 @@ public class KnifeEntity extends PersistentProjectileEntity {
         super(entityType, world);
     }
 
-    public KnifeEntity(World world, LivingEntity owner, ItemStack stack, boolean simulated) {
+    public KnifeEntity(World world, LivingEntity owner, ItemStack stack) {
         super(KitchenProjectiles.KNIFE_ENTITY, owner, world, stack, null);
-        dataTracker.set(KNIFE_STACK, stack);
+        dataTracker.set(TRACKED_STACK, getItemStack()); // minecraft:intangible_projectile is removed from instance but not copy
         updateLoyalty();
-        dataTracker.set(SIMULATED, simulated);
         if (owner instanceof PlayerEntity playerEntity) {
             var inventory = playerEntity.getInventory();
             var size = inventory.size();
@@ -64,14 +63,18 @@ public class KnifeEntity extends PersistentProjectileEntity {
     protected void initDataTracker(DataTracker.Builder builder) {
         super.initDataTracker(builder);
         builder.add(LOYALTY, (byte)0);
-        builder.add(KNIFE_STACK, getDefaultItemStack());
-        builder.add(SIMULATED, false);
+        builder.add(TRACKED_STACK, getDefaultItemStack());
     }
 
     @Override
     public void onTrackedDataSet(TrackedData<?> data) {
-        if (data == KNIFE_STACK)
+        if (data == TRACKED_STACK)
             setSound(getHitSound());
+    }
+
+    public boolean isIntangible() {
+        // Called on both sides
+        return getStackClient().contains(DataComponentTypes.INTANGIBLE_PROJECTILE);
     }
 
     @Override
@@ -82,7 +85,7 @@ public class KnifeEntity extends PersistentProjectileEntity {
 
         Entity entity = getOwner();
         var loyaltyLevel = dataTracker.get(LOYALTY);
-        if (loyaltyLevel > 0 && !dataTracker.get(SIMULATED) && (dealtDamage || isNoClip()) && entity != null) {
+        if (loyaltyLevel > 0 && !isIntangible() && (dealtDamage || isNoClip()) && entity != null) {
             if (!isOwnerAlive()) {
                 if (!getWorld().isClient && pickupType == PersistentProjectileEntity.PickupPermission.ALLOWED) {
                     dropStack(asItemStack(), 0.1F);
@@ -100,7 +103,7 @@ public class KnifeEntity extends PersistentProjectileEntity {
                 double d = 0.05 * (double) loyaltyLevel;
                 setVelocity(getVelocity().multiply(0.95).add(vec3d.normalize().multiply(d)));
                 if (returnTimer == 0) {
-                    playSound(KitchenProjectilesSounds.returning(getKnifeStack()), 10.0F, 1.0F);
+                    playSound(KitchenProjectilesSounds.returning(getItemStack()), 10.0F, 1.0F);
                     setVelocity(0, 0, 0);
                 }
 
@@ -121,19 +124,14 @@ public class KnifeEntity extends PersistentProjectileEntity {
         return ModItems.IRON_KNIFE.get().getDefaultStack();
     }
 
-    // Client
-    public ItemStack getKnifeStack() {
-        return dataTracker.get(KNIFE_STACK);
+    public ItemStack getStackClient() {
+        return dataTracker.get(TRACKED_STACK);
     }
 
     @Override
     protected void setStack(ItemStack stack) {
         super.setStack(stack);
-        dataTracker.set(KNIFE_STACK, stack);
-    }
-
-    public boolean isSimulated() {
-        return dataTracker.get(SIMULATED);
+        dataTracker.set(TRACKED_STACK, stack);
     }
 
     @Nullable
@@ -153,9 +151,9 @@ public class KnifeEntity extends PersistentProjectileEntity {
 
         if (entity instanceof LivingEntity livingEntity && BackstabbingEnchantment.isLookingBehindTarget(livingEntity, getPos()) && getWorld() instanceof ServerWorld serverLevel) {
             var dmg = new MutableFloat(damage);
-            EnchantmentHelper.forEachEnchantment(getKnifeStack(), (enchantment, powerLevel) -> {
-                enchantment.value().modifyValue(ModDataComponents.BACKSTABBING.get(), serverLevel, powerLevel, stack, this, damageSource, dmg);
-            });
+            EnchantmentHelper.forEachEnchantment(getItemStack(), (enchantment, powerLevel) ->
+                    enchantment.value().modifyValue(ModDataComponents.BACKSTABBING.get(), serverLevel, powerLevel, stack, this, damageSource, dmg)
+            );
 
             if (damage != dmg.getValue()) {
                 damage = dmg.getValue();
@@ -180,7 +178,7 @@ public class KnifeEntity extends PersistentProjectileEntity {
 
         setVelocity(getVelocity().multiply(-0.01, -0.1, -0.01));
 
-        playSound(KitchenProjectilesSounds.hit(getKnifeStack()), 1.0F, 1.0F);
+        playSound(KitchenProjectilesSounds.hit(getItemStack()), 1.0F, 1.0F);
     }
 
     @Override
@@ -216,7 +214,7 @@ public class KnifeEntity extends PersistentProjectileEntity {
 
     @Override
     protected SoundEvent getHitSound() {
-        return KitchenProjectilesSounds.hitGround(getKnifeStack());
+        return KitchenProjectilesSounds.hitGround(getStackClient());
     }
 
     @Override
@@ -230,7 +228,6 @@ public class KnifeEntity extends PersistentProjectileEntity {
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
         dealtDamage = nbt.getBoolean("DealtDamage");
-        dataTracker.set(SIMULATED, nbt.getBoolean("Simulated"));
         updateLoyalty();
         slot = nbt.getInt("Slot");
     }
@@ -239,7 +236,6 @@ public class KnifeEntity extends PersistentProjectileEntity {
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
         nbt.putBoolean("DealtDamage", dealtDamage);
-        nbt.putBoolean("Simulated", dataTracker.get(SIMULATED));
         nbt.putInt("Slot", slot);
     }
 
@@ -257,7 +253,7 @@ public class KnifeEntity extends PersistentProjectileEntity {
 
     @Override
     public Text getName() {
-        return getKnifeStack().getName();
+        return getStackClient().getName();
     }
 
     @Override

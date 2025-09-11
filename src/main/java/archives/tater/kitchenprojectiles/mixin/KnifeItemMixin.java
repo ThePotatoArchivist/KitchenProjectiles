@@ -2,6 +2,7 @@ package archives.tater.kitchenprojectiles.mixin;
 
 import archives.tater.kitchenprojectiles.KitchenProjectilesSounds;
 import archives.tater.kitchenprojectiles.KnifeEntity;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -13,6 +14,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.stat.Stats;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.Unit;
 import net.minecraft.util.UseAction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.RaycastContext;
@@ -60,7 +62,11 @@ public abstract class KnifeItemMixin extends Item {
             var spread = EnchantmentHelper.getProjectileSpread(serverWorld, stack, user, 0f);
 
 			for (var i = 0; i < multishot; i++) {
-				var knifeEntity = new KnifeEntity(world, playerEntity, stack.copy(), i != 0);
+                var projectileStack = stack.copy();
+                if (i != 0)
+                    projectileStack.set(DataComponentTypes.INTANGIBLE_PROJECTILE, Unit.INSTANCE);
+
+                var knifeEntity = new KnifeEntity(world, playerEntity, projectileStack);
 
                 var spreadIndex = (2 * (i % 2) - 1) * (i + 1) / 2; // 0, 1, -1, 2, -2, etc.
 
