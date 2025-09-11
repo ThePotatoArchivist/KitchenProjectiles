@@ -46,6 +46,7 @@ public class KnifeEntityRenderer extends EntityRenderer<KnifeEntity> {
 
         matrices.push();
         matrices.scale(0.85f * scale, 0.85f * scale, 0.85f * scale);
+        matrices.translate(0, -0.1f, 0);
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(MathHelper.lerp(tickDelta, entity.prevYaw, entity.getYaw()) - 90.0F));
         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(MathHelper.lerp(tickDelta, entity.prevPitch, entity.getPitch()) + 90.0F));
         matrices.translate(scale * 0.2, scale * 0.1, 0);
