@@ -17,7 +17,7 @@ public class RandomChanceWithEnchantedBonusLootConditionMixin {
             method = "method_952",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/registry/RegistryWrapper$Impl;getOrThrow(Lnet/minecraft/registry/RegistryKey;)Lnet/minecraft/registry/entry/RegistryEntry$Reference;")
     )
-    private static RegistryEntry.Reference<Enchantment> handle(RegistryWrapper.Impl<Enchantment> instance, RegistryKey<Enchantment> registryKey, Operation<RegistryEntry.Reference<Enchantment>> original) {
+    private static RegistryEntry.Reference<Enchantment> handleMissingLooting(RegistryWrapper.Impl<Enchantment> instance, RegistryKey<Enchantment> registryKey, Operation<RegistryEntry.Reference<Enchantment>> original) {
         return instance.getOptional(registryKey).orElse(instance.getOrThrow(ModEnchantments.EMPTY_KEY));
     }
 }
