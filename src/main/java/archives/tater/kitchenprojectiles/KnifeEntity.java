@@ -150,6 +150,11 @@ public class KnifeEntity extends PersistentProjectileEntity {
         dataTracker.set(TRACKED_STACK, stack);
     }
 
+    @Override
+    protected boolean canHit(Entity entity) {
+        return super.canHit(entity) && (entity != getOwner() || !noClip);
+    }
+
     @Nullable
     @Override
     protected EntityHitResult getEntityCollision(Vec3d currentPosition, Vec3d nextPosition) {

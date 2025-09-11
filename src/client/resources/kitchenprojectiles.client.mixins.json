@@ -3,9 +3,11 @@
   "package": "archives.tater.kitchenprojectiles.mixin.client",
   "compatibilityLevel": "JAVA_17",
   "client": [
-    "ItemRendererMixin"
+    "ItemRendererMixin",
+    "enchancement.ToggleablePassivesEventMixin"
   ],
+  "plugin": "archives.tater.kitchenprojectiles.KitchenProjectilesMixinPlugin",
   "injectors": {
     "defaultRequire": 1
-	}
+  }
 }

@@ -4,9 +4,12 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "KnifeItemMixin",
-    "PersistentProjectileEntityMixin"
+    "PersistentProjectileEntityMixin",
+    "enchancement.EnchantmentHelperMixin",
+    "enchancement.RandomChanceWithEnchantedBonusLootConditionMixin"
   ],
+  "plugin": "archives.tater.kitchenprojectiles.KitchenProjectilesMixinPlugin",
   "injectors": {
     "defaultRequire": 1
-	}
+  }
 }

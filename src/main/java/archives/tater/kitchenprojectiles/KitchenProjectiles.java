@@ -14,7 +14,7 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vectorwing.farmersdelight.common.item.KnifeItem;
+import vectorwing.farmersdelight.common.tag.ModTags;
 
 public class KitchenProjectiles implements ModInitializer {
 	public static final String MOD_ID = "kitchenprojectiles";
@@ -48,7 +48,7 @@ public class KitchenProjectiles implements ModInitializer {
 		KitchenProjectilesSounds.init();
 
         EnchantmentEvents.ALLOW_ENCHANTING.register((enchantment, target, enchantingContext) ->
-            target.getItem() instanceof KnifeItem &&
+            target.isIn(ModTags.KNIFE_ENCHANTABLE) &&
                     enchantment.getKey().map(key -> key == Enchantments.LOYALTY || key == Enchantments.MULTISHOT).orElse(false)
                     ? TriState.TRUE
                     : TriState.DEFAULT
