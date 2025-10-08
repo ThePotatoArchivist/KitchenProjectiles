@@ -5,10 +5,12 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.item.ItemModelManager;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.state.ProjectileEntityRenderState;
 import net.minecraft.client.render.item.ItemRenderState;
+import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.util.math.BlockPos;
@@ -58,7 +60,7 @@ public class KnifeEntityRenderer extends EntityRenderer<KnifeEntity, KnifeEntity
     }
 
     @Override
-    public void render(KnifeEntityRenderState state, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+    public void render(KnifeEntityRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraState) {
 //        if (state.age < 2 && dispatcher.camera.getFocusedEntity().squaredDistanceTo(state.pos) < MIN_DISTANCE) return;
 
         matrices.push();
@@ -73,13 +75,13 @@ public class KnifeEntityRenderer extends EntityRenderer<KnifeEntity, KnifeEntity
         if (state.intangible)
             intangible = true;
 
-        state.knifeRenderState.render(matrices, vertexConsumers, light, OverlayTexture.DEFAULT_UV);
+        state.knifeRenderState.render(matrices, queue, state.light, OverlayTexture.DEFAULT_UV, 0);
 
         intangible = false;
 
         matrices.pop();
 
-        super.render(state, matrices, vertexConsumers, light);
+        super.render(state, matrices, queue, cameraState);
     }
 
     public static class KnifeEntityRenderState extends ProjectileEntityRenderState {

@@ -50,7 +50,7 @@ public abstract class PersistentProjectileEntityMixin extends ProjectileEntity {
     )
     private void cancelCollision(BlockHitResult blockHitResult, CallbackInfo ci, @Local EntityHitResult entityHitResult) {
         if ((Object) this instanceof KnifeEntity knifeEntity && !knifeEntity.hasDealtDamage() && entityHitResult == null && isNoClip()) {
-            setPosition(getPos().add(getVelocity()));
+            setPosition(getEntityPos().add(getVelocity()));
             ci.cancel();
         }
     }

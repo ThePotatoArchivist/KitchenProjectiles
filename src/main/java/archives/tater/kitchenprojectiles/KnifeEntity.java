@@ -81,7 +81,7 @@ public class KnifeEntity extends PersistentProjectileEntity {
 
     private void updateLoyalty() {
         var owner = getOwner();
-        dataTracker.set(LOYALTY, owner != null && getWorld() instanceof ServerWorld serverWorld ? (byte) EnchantmentHelper.getTridentReturnAcceleration(serverWorld, getItemStack(), owner) : 0);
+        dataTracker.set(LOYALTY, owner != null && getEntityWorld() instanceof ServerWorld serverWorld ? (byte) EnchantmentHelper.getTridentReturnAcceleration(serverWorld, getItemStack(), owner) : 0);
     }
 
     private int getLoyalty() {
@@ -105,16 +105,16 @@ public class KnifeEntity extends PersistentProjectileEntity {
         var loyaltyLevel = getLoyalty();
         if (loyaltyLevel > 0 && !isIntangible() && (hasHit || isNoClip()) && entity != null) {
             if (!isOwnerAlive()) {
-                if (getWorld() instanceof ServerWorld serverWorld && pickupType == PersistentProjectileEntity.PickupPermission.ALLOWED) {
+                if (getEntityWorld() instanceof ServerWorld serverWorld && pickupType == PersistentProjectileEntity.PickupPermission.ALLOWED) {
                     dropStack(serverWorld, asItemStack(), 0.1F);
                 }
 
                 discard();
             } else {
                 setNoClip(true);
-                Vec3d vec3d = entity.getEyePos().subtract(getPos());
+                Vec3d vec3d = entity.getEyePos().subtract(getEntityPos());
                 setPos(getX(), getY() + vec3d.y * 0.015 * (double) loyaltyLevel, getZ());
-                if (getWorld().isClient) {
+                if (getEntityWorld().isClient()) {
                     lastRenderY = getY();
                 }
 
@@ -170,9 +170,9 @@ public class KnifeEntity extends PersistentProjectileEntity {
         var stack = getItemStack();
         var damageSource = getDamageSources().create(KitchenProjectiles.KNIFE_DAMAGE, this, owner == null ? this : owner);
 
-        var damage = KitchenProjectilesUtil.getDamage(stack, damageSource, getWorld(), entity);
+        var damage = KitchenProjectilesUtil.getDamage(stack, damageSource, getEntityWorld(), entity);
 
-        if (entity instanceof LivingEntity livingEntity && BackstabbingEnchantment.isLookingBehindTarget(livingEntity, getPos()) && getWorld() instanceof ServerWorld serverLevel) {
+        if (entity instanceof LivingEntity livingEntity && BackstabbingEnchantment.isLookingBehindTarget(livingEntity, getEntityPos()) && getEntityWorld() instanceof ServerWorld serverLevel) {
             var dmg = new MutableFloat(damage);
             EnchantmentHelper.forEachEnchantment(getItemStack(), (enchantment, powerLevel) ->
                     enchantment.value().modifyValue(ModDataComponents.BACKSTABBING.get(), serverLevel, powerLevel, stack, this, damageSource, dmg)
@@ -192,7 +192,7 @@ public class KnifeEntity extends PersistentProjectileEntity {
             }
 
             if (entity instanceof LivingEntity livingEntity2) {
-                if (owner instanceof LivingEntity && getWorld() instanceof ServerWorld serverWorld) {
+                if (owner instanceof LivingEntity && getEntityWorld() instanceof ServerWorld serverWorld) {
                     EnchantmentHelper.onTargetDamaged(serverWorld, entity, damageSource, stack);
                 }
 

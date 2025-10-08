@@ -59,7 +59,7 @@ public abstract class KnifeItemMixin extends Item {
         if (user.getItemUseTime() < KitchenProjectiles.MIN_USE_DURATION) return false;
 
 		if (world instanceof ServerWorld serverWorld) {
-            stack.damage(1, user, LivingEntity.getSlotForHand(user.getActiveHand()));
+            stack.damage(1, user, user.getActiveHand());
 
 			var multishot = EnchantmentHelper.getProjectileCount(serverWorld, stack, user, 1);
             var spread = EnchantmentHelper.getProjectileSpread(serverWorld, stack, user, 0f);

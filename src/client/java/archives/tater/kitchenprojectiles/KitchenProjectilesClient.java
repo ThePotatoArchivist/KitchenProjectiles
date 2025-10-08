@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.client.model.loading.v1.ExtraModelKey;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.SimpleUnbakedExtraModel;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.minecraft.client.render.entity.EntityRendererFactories;
 import net.minecraft.client.render.item.model.BasicItemModel;
 import net.minecraft.client.render.item.model.ConditionItemModel;
 import net.minecraft.client.render.item.property.bool.UsingItemProperty;
@@ -22,10 +23,11 @@ public class KitchenProjectilesClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		// This entrypoint is suitable for setting up client-specific logic, such as rendering.
-		EntityRendererRegistry.register(KitchenProjectiles.KNIFE_ENTITY, KnifeEntityRenderer::new);
+		EntityRendererFactories.register(KitchenProjectiles.KNIFE_ENTITY, KnifeEntityRenderer::new);
 
 		var knives = Stream.of(
                 ModItems.FLINT_KNIFE.get(),
+                ModItems.COPPER_KNIFE.get(),
                 ModItems.IRON_KNIFE.get(),
                 ModItems.GOLDEN_KNIFE.get(),
                 ModItems.DIAMOND_KNIFE.get(),

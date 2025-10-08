@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 public class LivingEntityMixin {
     @ModifyVariable(method = "damage", at = @At("HEAD"), argsOnly = true)
     private float applyKnifeRage(float value, @Local(argsOnly = true) DamageSource source) {
-        if (!(source.getSource() instanceof KnifeEntity knifeEntity) || !(knifeEntity.getOwner() instanceof LivingEntity livingEntity) || knifeEntity.getWorld().isClient)
+        if (!(source.getSource() instanceof KnifeEntity knifeEntity) || !(knifeEntity.getOwner() instanceof LivingEntity livingEntity) || knifeEntity.getEntityWorld().isClient())
             return value;
         return value + RageEffect.getDamageDealtModifier(livingEntity, knifeEntity.getItemStack());
     }
