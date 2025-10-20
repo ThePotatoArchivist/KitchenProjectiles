@@ -3,6 +3,9 @@ package archives.tater.kitchenprojectiles.mixin;
 import archives.tater.kitchenprojectiles.KitchenProjectiles;
 import archives.tater.kitchenprojectiles.KitchenProjectilesSounds;
 import archives.tater.kitchenprojectiles.KnifeEntity;
+
+import org.spongepowered.asm.mixin.Mixin;
+
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.LivingEntity;
@@ -20,8 +23,8 @@ import net.minecraft.util.Unit;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
+
 import org.joml.Quaternionf;
-import org.spongepowered.asm.mixin.Mixin;
 import vectorwing.farmersdelight.common.item.KnifeItem;
 import vectorwing.farmersdelight.common.registry.ModBlocks;
 
@@ -29,19 +32,18 @@ import vectorwing.farmersdelight.common.registry.ModBlocks;
 public abstract class KnifeItemMixin extends Item {
 
     public KnifeItemMixin(Settings settings) {
-		super(settings);
-	}
+        super(settings);
+    }
 
 
-
-	@Override
-	public ActionResult use(World world, PlayerEntity user, Hand hand) {
-		var stack = user.getStackInHand(hand);
-		if (stack.getMaxDamage() - stack.getDamage() <= 1 || world.getBlockState(raycast(world, user, RaycastContext.FluidHandling.NONE).getBlockPos()).isOf(ModBlocks.CUTTING_BOARD.get()))
-			return ActionResult.PASS;
-		user.setCurrentHand(hand);
-		return ActionResult.CONSUME;
-	}
+    @Override
+    public ActionResult use(World world, PlayerEntity user, Hand hand) {
+        var stack = user.getStackInHand(hand);
+        if (stack.getMaxDamage() - stack.getDamage() <= 1 || world.getBlockState(raycast(world, user, RaycastContext.FluidHandling.NONE).getBlockPos()).isOf(ModBlocks.CUTTING_BOARD.get()))
+            return ActionResult.PASS;
+        user.setCurrentHand(hand);
+        return ActionResult.CONSUME;
+    }
 
     @Override
     public int getMaxUseTime(ItemStack stack, LivingEntity user) {
@@ -49,53 +51,53 @@ public abstract class KnifeItemMixin extends Item {
     }
 
     @Override
-	public UseAction getUseAction(ItemStack stack) {
-		return UseAction.SPEAR;
-	}
+    public UseAction getUseAction(ItemStack stack) {
+        return UseAction.SPEAR;
+    }
 
-	@Override
-	public boolean onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
-		if (!(user instanceof PlayerEntity playerEntity)) return false;
+    @Override
+    public boolean onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
+        if (!(user instanceof PlayerEntity playerEntity)) return false;
         if (user.getItemUseTime() < KitchenProjectiles.MIN_USE_DURATION) return false;
 
-		if (world instanceof ServerWorld serverWorld) {
-            stack.damage(1, user, user.getActiveHand());
+        if (!(world instanceof ServerWorld serverWorld)) return true;
 
-			var multishot = EnchantmentHelper.getProjectileCount(serverWorld, stack, user, 1);
-            var spread = EnchantmentHelper.getProjectileSpread(serverWorld, stack, user, 0f);
+        stack.damage(1, user, user.getActiveHand());
 
-			for (var i = 0; i < multishot; i++) {
-                var projectileStack = i == 0 ? stack : stack.copy();
-                if (i != 0)
-                    projectileStack.set(DataComponentTypes.INTANGIBLE_PROJECTILE, Unit.INSTANCE);
+        var multishot = EnchantmentHelper.getProjectileCount(serverWorld, stack, user, 1);
+        var spread = EnchantmentHelper.getProjectileSpread(serverWorld, stack, user, 0f);
 
-                var knifeEntity = new KnifeEntity(world, playerEntity, projectileStack);
+        for (var i = 0; i < multishot; i++) {
+            var projectileStack = i == 0 ? stack : stack.copy();
+            if (i != 0)
+                projectileStack.set(DataComponentTypes.INTANGIBLE_PROJECTILE, Unit.INSTANCE);
 
-                var spreadIndex = (2 * (i % 2) - 1) * (i + 1) / 2; // 0, 1, -1, 2, -2, etc.
+            var knifeEntity = new KnifeEntity(world, playerEntity, projectileStack);
 
-                var yaw = spread * spreadIndex;
+            var spreadIndex = (2 * (i % 2) - 1) * (i + 1) / 2; // 0, 1, -1, 2, -2, etc.
 
-                var opposite = user.getOppositeRotationVector(1f);
-                var quaternion = new Quaternionf().setAngleAxis(yaw * MathHelper.RADIANS_PER_DEGREE, opposite.x, opposite.y, opposite.z);
-                var rotation = user.getRotationVec(1f);
-                var velocity = rotation.toVector3f().rotate(quaternion);
+            var yaw = spread * spreadIndex;
 
-                knifeEntity.setVelocity(velocity.x, velocity.y, velocity.z, 1.5f, 1f);
+            var opposite = user.getOppositeRotationVector(1f);
+            var quaternion = new Quaternionf().setAngleAxis(yaw * MathHelper.RADIANS_PER_DEGREE, opposite.x, opposite.y, opposite.z);
+            var rotation = user.getRotationVec(1f);
+            var velocity = rotation.toVector3f().rotate(quaternion);
 
-				if (playerEntity.getAbilities().creativeMode || i != 0) {
-					knifeEntity.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
-				}
+            knifeEntity.setVelocity(velocity.x, velocity.y, velocity.z, 1.5f, 1f);
 
-				world.spawnEntity(knifeEntity);
-				if (i == 0)
-					world.playSoundFromEntity(null, knifeEntity, KitchenProjectilesSounds.throwing(stack), SoundCategory.PLAYERS, 1.0F, 1.0F);
-			}
-		}
+            if (playerEntity.getAbilities().creativeMode || i != 0) {
+                knifeEntity.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
+            }
 
-		if (!playerEntity.getAbilities().creativeMode)
-			stack.decrement(1);
+            world.spawnEntity(knifeEntity);
+            if (i == 0)
+                world.playSoundFromEntity(null, knifeEntity, KitchenProjectilesSounds.throwing(stack), SoundCategory.PLAYERS, 1.0F, 1.0F);
+        }
 
-		playerEntity.incrementStat(Stats.USED.getOrCreateStat(this));
+        if (!playerEntity.getAbilities().creativeMode)
+            stack.decrement(1);
+
+        playerEntity.incrementStat(Stats.USED.getOrCreateStat(this));
         return true;
     }
 }
