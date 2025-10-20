@@ -23,11 +23,10 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.Nullable;
 import vectorwing.farmersdelight.common.item.enchantment.BackstabbingEnchantment;
-import vectorwing.farmersdelight.common.registry.ModDataComponents;
-import vectorwing.farmersdelight.common.registry.ModItems;
 
 public class KnifeEntity extends PersistentProjectileEntity {
     private static final TrackedData<Byte> LOYALTY = DataTracker.registerData(KnifeEntity.class, TrackedDataHandlerRegistry.BYTE);
@@ -96,7 +95,7 @@ public class KnifeEntity extends PersistentProjectileEntity {
     public void tick() {
         if (inGroundTime > 4) {
             hasHit = true;
-            if (!EnchantmentHelper.hasAnyEnchantmentsWith(getStackClient(), ModDataComponents.BACKSTABBING.get()))
+            if (!EnchantmentHelper.hasAnyEnchantmentsWith(getStackClient(), KitchenProjectiles.BACKSTABBING.get()))
                 setDealtDamage(true);
         }
 
@@ -138,7 +137,7 @@ public class KnifeEntity extends PersistentProjectileEntity {
 
     @Override
     protected ItemStack getDefaultItemStack() {
-        return ModItems.IRON_KNIFE.get().getDefaultStack();
+        return KitchenProjectiles.IRON_KNIFE.get().getDefaultStack();
     }
 
     public ItemStack getStackClient() {
@@ -174,7 +173,7 @@ public class KnifeEntity extends PersistentProjectileEntity {
         if (entity instanceof LivingEntity livingEntity && BackstabbingEnchantment.isLookingBehindTarget(livingEntity, getPos()) && getWorld() instanceof ServerWorld serverLevel) {
             var dmg = new MutableFloat(damage);
             EnchantmentHelper.forEachEnchantment(getItemStack(), (enchantment, powerLevel) ->
-                    enchantment.value().modifyValue(ModDataComponents.BACKSTABBING.get(), serverLevel, powerLevel, stack, this, damageSource, dmg)
+                    enchantment.value().modifyValue(KitchenProjectiles.BACKSTABBING.get(), serverLevel, powerLevel, stack, this, damageSource, dmg)
             );
 
             if (damage != dmg.getValue()) {

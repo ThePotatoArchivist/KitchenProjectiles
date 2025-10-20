@@ -1,5 +1,6 @@
 package archives.tater.kitchenprojectiles.mixin;
 
+import archives.tater.kitchenprojectiles.KitchenProjectiles;
 import archives.tater.kitchenprojectiles.KitchenProjectilesSounds;
 import archives.tater.kitchenprojectiles.KnifeEntity;
 
@@ -25,7 +26,6 @@ import net.minecraft.world.World;
 
 import org.joml.Quaternionf;
 import vectorwing.farmersdelight.common.item.KnifeItem;
-import vectorwing.farmersdelight.common.registry.ModBlocks;
 
 @Mixin(KnifeItem.class)
 public abstract class KnifeItemMixin extends Item {
@@ -37,7 +37,7 @@ public abstract class KnifeItemMixin extends Item {
 	@Override
 	public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
 		var stack = user.getStackInHand(hand);
-		if (stack.getMaxDamage() - stack.getDamage() <= 1 || world.getBlockState(raycast(world, user, RaycastContext.FluidHandling.NONE).getBlockPos()).isOf(ModBlocks.CUTTING_BOARD.get()))
+		if (stack.getMaxDamage() - stack.getDamage() <= 1 || world.getBlockState(raycast(world, user, RaycastContext.FluidHandling.NONE).getBlockPos()).isOf(KitchenProjectiles.CUTTING_BOARD.get()))
 			return TypedActionResult.pass(stack);
 		user.setCurrentHand(hand);
 		return TypedActionResult.consume(stack);
