@@ -18,7 +18,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EntityType.Builder;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -38,7 +37,7 @@ public class KitchenProjectiles {
     public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(Registries.ENTITY_TYPE, MOD_ID);
 
     public static final DeferredHolder<EntityType<?>, EntityType<KnifeEntity>> KNIFE_ENTITY = ENTITIES.register("knife", () ->
-            Builder.<KnifeEntity>of(KnifeEntity::new, MobCategory.MISC)
+            EntityType.Builder.<KnifeEntity>of(KnifeEntity::new, MobCategory.MISC)
                     .sized(0.4f, 0.4f)
                     .clientTrackingRange(4)
                     .updateInterval(20)
