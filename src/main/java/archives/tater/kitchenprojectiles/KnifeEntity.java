@@ -43,7 +43,7 @@ public class KnifeEntity extends AbstractArrow {
     }
 
     public KnifeEntity(Level level, LivingEntity owner, ItemStack stack) {
-        super(KitchenProjectiles.KNIFE_ENTITY, owner, level, stack, null);
+        super(KitchenProjectiles.KNIFE_ENTITY.get(), owner, level, stack, null);
         entityData.set(TRACKED_STACK, getPickupItemStackOrigin()); // minecraft:intangible_projectile is removed from instance but not copy
         updateLoyalty();
         if (owner instanceof Player playerEntity) {
