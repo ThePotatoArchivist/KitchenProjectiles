@@ -1,14 +1,16 @@
 package archives.tater.kitchenprojectiles.mixin.client;
 
-import archives.tater.kitchenprojectiles.KnifeEntityRenderer;
+import archives.tater.kitchenprojectiles.client.KnifeEntityRenderer;
+
 import com.llamalad7.mixinextras.sugar.Local;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
+
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.entity.ItemRenderer;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(ItemRenderer.class)
 public class ItemRendererMixin {

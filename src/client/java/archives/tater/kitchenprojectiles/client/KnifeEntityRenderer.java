@@ -1,4 +1,6 @@
-package archives.tater.kitchenprojectiles;
+package archives.tater.kitchenprojectiles.client;
+
+import archives.tater.kitchenprojectiles.KnifeEntity;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

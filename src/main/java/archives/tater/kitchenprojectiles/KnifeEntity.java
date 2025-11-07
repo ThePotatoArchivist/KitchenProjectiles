@@ -24,6 +24,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import vectorwing.farmersdelight.common.item.enchantment.BackstabbingEnchantment;
 import vectorwing.farmersdelight.common.registry.ModDataComponents;
@@ -37,12 +38,12 @@ public class KnifeEntity extends AbstractArrow {
     private int slot = -1;
     public int returnTimer;
 
-    protected KnifeEntity(EntityType<? extends AbstractArrow> entityType, Level world) {
-        super(entityType, world);
+    protected KnifeEntity(EntityType<? extends AbstractArrow> entityType, Level level) {
+        super(entityType, level);
     }
 
-    public KnifeEntity(Level world, LivingEntity owner, ItemStack stack) {
-        super(KitchenProjectiles.KNIFE_ENTITY, owner, world, stack, null);
+    public KnifeEntity(Level level, LivingEntity owner, ItemStack stack) {
+        super(KitchenProjectiles.KNIFE_ENTITY, owner, level, stack, null);
         entityData.set(TRACKED_STACK, getPickupItemStackOrigin()); // minecraft:intangible_projectile is removed from instance but not copy
         updateLoyalty();
         if (owner instanceof Player playerEntity) {
@@ -80,7 +81,7 @@ public class KnifeEntity extends AbstractArrow {
 
     private void updateLoyalty() {
         var owner = getOwner();
-        entityData.set(LOYALTY, owner != null && level() instanceof ServerLevel serverWorld ? (byte) EnchantmentHelper.getTridentReturnToOwnerAcceleration(serverWorld, getPickupItemStackOrigin(), owner) : 0);
+        entityData.set(LOYALTY, owner != null && level() instanceof ServerLevel serverLevel ? (byte) EnchantmentHelper.getTridentReturnToOwnerAcceleration(serverLevel, getPickupItemStackOrigin(), owner) : 0);
     }
 
     private int getLoyalty() {
@@ -137,7 +138,7 @@ public class KnifeEntity extends AbstractArrow {
     }
 
     @Override
-    protected ItemStack getDefaultPickupItem() {
+    protected @NotNull ItemStack getDefaultPickupItem() {
         return ModItems.IRON_KNIFE.get().getDefaultInstance();
     }
 
@@ -191,8 +192,8 @@ public class KnifeEntity extends AbstractArrow {
             }
 
             if (entity instanceof LivingEntity livingEntity2) {
-                if (owner instanceof LivingEntity && level() instanceof ServerLevel serverWorld) {
-                    EnchantmentHelper.doPostAttackEffectsWithItemSource(serverWorld, entity, damageSource, stack);
+                if (owner instanceof LivingEntity && level() instanceof ServerLevel serverLevel) {
+                    EnchantmentHelper.doPostAttackEffectsWithItemSource(serverLevel, entity, damageSource, stack);
                 }
 
                 doPostHurtEffects(livingEntity2);
@@ -205,14 +206,14 @@ public class KnifeEntity extends AbstractArrow {
     }
 
     @Override
-    protected void hitBlockEnchantmentEffects(ServerLevel world, BlockHitResult blockHitResult, ItemStack weaponStack) {
-        EnchantmentHelper.onHitBlock(world,
+    protected void hitBlockEnchantmentEffects(ServerLevel level, BlockHitResult blockHitResult, ItemStack weaponStack) {
+        EnchantmentHelper.onHitBlock(level,
                 weaponStack,
                 this.getOwner() instanceof LivingEntity livingEntity ? livingEntity : null,
                 this,
                 null,
                 blockHitResult.getBlockPos().clampLocationWithin(blockHitResult.getLocation()),
-                world.getBlockState(blockHitResult.getBlockPos()),
+                level.getBlockState(blockHitResult.getBlockPos()),
                 item -> kill());
     }
 
@@ -236,7 +237,7 @@ public class KnifeEntity extends AbstractArrow {
     }
 
     @Override
-    protected SoundEvent getDefaultHitGroundSoundEvent() {
+    protected @NotNull SoundEvent getDefaultHitGroundSoundEvent() {
         return KitchenProjectilesSounds.hitGround(getStackClient());
     }
 
@@ -277,7 +278,7 @@ public class KnifeEntity extends AbstractArrow {
     }
 
     @Override
-    public Component getName() {
+    public @NotNull Component getName() {
         return getStackClient().getHoverName();
     }
 

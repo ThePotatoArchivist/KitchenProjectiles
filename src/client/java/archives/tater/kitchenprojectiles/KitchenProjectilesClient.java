@@ -1,5 +1,7 @@
 package archives.tater.kitchenprojectiles;
 
+import archives.tater.kitchenprojectiles.client.KnifeEntityRenderer;
+
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
@@ -24,7 +26,7 @@ public class KitchenProjectilesClient implements ClientModInitializer {
 		// This entrypoint is suitable for setting up client-specific logic, such as rendering.
 		EntityRendererRegistry.register(KitchenProjectiles.KNIFE_ENTITY, KnifeEntityRenderer::new);
 
-		ItemProperties.registerGeneric(THROWING_PREDICATE, (stack, world, entity, seed) ->
+		ItemProperties.registerGeneric(THROWING_PREDICATE, (stack, level, entity, seed) ->
 				entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F
 		);
 

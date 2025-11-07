@@ -13,7 +13,7 @@ import net.minecraft.world.level.Level;
 public class KitchenProjectilesUtil {
     private KitchenProjectilesUtil() {}
 
-    public static float getDamage(ItemStack stack, DamageSource source, Level world, Entity target) {
+    public static float getDamage(ItemStack stack, DamageSource source, Level level, Entity target) {
         var instance = new AttributeInstance(Attributes.ATTACK_DAMAGE, ignored -> {});
         instance.setBaseValue(1.0);
         stack.forEachModifier(EquipmentSlot.MAINHAND, (attribute, modifier) -> {
@@ -21,8 +21,8 @@ public class KitchenProjectilesUtil {
                 instance.addTransientModifier(modifier);
         });
 
-        if (!(world instanceof ServerLevel serverWorld)) return (float) instance.getValue();
+        if (!(level instanceof ServerLevel serverLevel)) return (float) instance.getValue();
 
-        return EnchantmentHelper.modifyDamage(serverWorld, stack, target, source, (float) instance.getValue());
+        return EnchantmentHelper.modifyDamage(serverLevel, stack, target, source, (float) instance.getValue());
     }
 }
