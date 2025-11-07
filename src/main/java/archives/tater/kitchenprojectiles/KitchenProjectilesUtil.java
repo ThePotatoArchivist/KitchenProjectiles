@@ -1,28 +1,28 @@
 package archives.tater.kitchenprojectiles;
 
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.attribute.EntityAttributeInstance;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.World;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.level.Level;
 
 public class KitchenProjectilesUtil {
     private KitchenProjectilesUtil() {}
 
-    public static float getDamage(ItemStack stack, DamageSource source, World world, Entity target) {
-        var instance = new EntityAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE, ignored -> {});
+    public static float getDamage(ItemStack stack, DamageSource source, Level world, Entity target) {
+        var instance = new AttributeInstance(Attributes.ATTACK_DAMAGE, ignored -> {});
         instance.setBaseValue(1.0);
-        stack.applyAttributeModifiers(EquipmentSlot.MAINHAND, (attribute, modifier) -> {
-            if (attribute == EntityAttributes.GENERIC_ATTACK_DAMAGE)
-                instance.addTemporaryModifier(modifier);
+        stack.forEachModifier(EquipmentSlot.MAINHAND, (attribute, modifier) -> {
+            if (attribute == Attributes.ATTACK_DAMAGE)
+                instance.addTransientModifier(modifier);
         });
 
-        if (!(world instanceof ServerWorld serverWorld)) return (float) instance.getValue();
+        if (!(world instanceof ServerLevel serverWorld)) return (float) instance.getValue();
 
-        return EnchantmentHelper.getDamage(serverWorld, stack, target, source, (float) instance.getValue());
+        return EnchantmentHelper.modifyDamage(serverWorld, stack, target, source, (float) instance.getValue());
     }
 }

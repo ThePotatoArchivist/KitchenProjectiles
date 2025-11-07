@@ -1,14 +1,14 @@
 package archives.tater.kitchenprojectiles;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.item.ItemStack;
 
 public class KitchenProjectilesSounds {
-    private static SoundEvent of(Identifier id) {
-        return Registry.register(Registries.SOUND_EVENT, id, SoundEvent.of(id));
+    private static SoundEvent of(ResourceLocation id) {
+        return Registry.register(BuiltInRegistries.SOUND_EVENT, id, SoundEvent.createVariableRangeEvent(id));
     }
 
     private static SoundEvent of(String path) {
@@ -25,7 +25,7 @@ public class KitchenProjectilesSounds {
     public static final SoundEvent KNIFE_RETURN_HEAVY = of("entity.kitchenprojectiles.knife.heavy.return");
 
     public static boolean isKnifeLight(ItemStack knifeStack) {
-        return knifeStack.isIn(KitchenProjectiles.LIGHT_KNIVES);
+        return knifeStack.is(KitchenProjectiles.LIGHT_KNIVES);
     }
 
     public static SoundEvent throwing(ItemStack knifeStack) {

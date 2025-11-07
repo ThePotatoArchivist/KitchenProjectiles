@@ -1,55 +1,55 @@
 package archives.tater.kitchenprojectiles;
 
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.data.TrackedData;
-import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.entity.projectile.PersistentProjectileEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.Nullable;
 import vectorwing.farmersdelight.common.item.enchantment.BackstabbingEnchantment;
 import vectorwing.farmersdelight.common.registry.ModDataComponents;
 import vectorwing.farmersdelight.common.registry.ModItems;
 
-public class KnifeEntity extends PersistentProjectileEntity {
-    private static final TrackedData<Byte> LOYALTY = DataTracker.registerData(KnifeEntity.class, TrackedDataHandlerRegistry.BYTE);
-    private static final TrackedData<ItemStack> TRACKED_STACK = DataTracker.registerData(KnifeEntity.class, TrackedDataHandlerRegistry.ITEM_STACK);
-    private static final TrackedData<Boolean> DEALT_DAMAGE = DataTracker.registerData(KnifeEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+public class KnifeEntity extends AbstractArrow {
+    private static final EntityDataAccessor<Byte> LOYALTY = SynchedEntityData.defineId(KnifeEntity.class, EntityDataSerializers.BYTE);
+    private static final EntityDataAccessor<ItemStack> TRACKED_STACK = SynchedEntityData.defineId(KnifeEntity.class, EntityDataSerializers.ITEM_STACK);
+    private static final EntityDataAccessor<Boolean> DEALT_DAMAGE = SynchedEntityData.defineId(KnifeEntity.class, EntityDataSerializers.BOOLEAN);
     private boolean hasHit;
     private int slot = -1;
     public int returnTimer;
 
-    protected KnifeEntity(EntityType<? extends PersistentProjectileEntity> entityType, World world) {
+    protected KnifeEntity(EntityType<? extends AbstractArrow> entityType, Level world) {
         super(entityType, world);
     }
 
-    public KnifeEntity(World world, LivingEntity owner, ItemStack stack) {
+    public KnifeEntity(Level world, LivingEntity owner, ItemStack stack) {
         super(KitchenProjectiles.KNIFE_ENTITY, owner, world, stack, null);
-        dataTracker.set(TRACKED_STACK, getItemStack()); // minecraft:intangible_projectile is removed from instance but not copy
+        entityData.set(TRACKED_STACK, getPickupItemStackOrigin()); // minecraft:intangible_projectile is removed from instance but not copy
         updateLoyalty();
-        if (owner instanceof PlayerEntity playerEntity) {
+        if (owner instanceof Player playerEntity) {
             var inventory = playerEntity.getInventory();
-            var size = inventory.size();
+            var size = inventory.getContainerSize();
             for (int iSlot = 0; iSlot < size; iSlot++)
-                if (inventory.getStack(iSlot) == stack) {
+                if (inventory.getItem(iSlot) == stack) {
                     slot = iSlot;
                     break;
                 }
@@ -57,71 +57,71 @@ public class KnifeEntity extends PersistentProjectileEntity {
     }
 
     @Override
-    protected void initDataTracker(DataTracker.Builder builder) {
-        super.initDataTracker(builder);
-        builder.add(LOYALTY, (byte)0);
-        builder.add(TRACKED_STACK, getDefaultItemStack());
-        builder.add(DEALT_DAMAGE, false);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(LOYALTY, (byte)0);
+        builder.define(TRACKED_STACK, getDefaultPickupItem());
+        builder.define(DEALT_DAMAGE, false);
     }
 
     @Override
-    public void onTrackedDataSet(TrackedData<?> data) {
+    public void onSyncedDataUpdated(EntityDataAccessor<?> data) {
         if (data == TRACKED_STACK)
-            setSound(getHitSound());
+            setSoundEvent(getDefaultHitGroundSoundEvent());
     }
 
     public boolean hasDealtDamage() {
-        return dataTracker.get(DEALT_DAMAGE);
+        return entityData.get(DEALT_DAMAGE);
     }
 
     private void setDealtDamage(boolean dealtDamage) {
-        dataTracker.set(DEALT_DAMAGE, dealtDamage);
+        entityData.set(DEALT_DAMAGE, dealtDamage);
     }
 
     private void updateLoyalty() {
         var owner = getOwner();
-        dataTracker.set(LOYALTY, owner != null && getWorld() instanceof ServerWorld serverWorld ? (byte) EnchantmentHelper.getTridentReturnAcceleration(serverWorld, getItemStack(), owner) : 0);
+        entityData.set(LOYALTY, owner != null && level() instanceof ServerLevel serverWorld ? (byte) EnchantmentHelper.getTridentReturnToOwnerAcceleration(serverWorld, getPickupItemStackOrigin(), owner) : 0);
     }
 
     private int getLoyalty() {
-        return dataTracker.get(LOYALTY);
+        return entityData.get(LOYALTY);
     }
 
     public boolean isIntangible() {
         // Called on both sides
-        return getStackClient().contains(DataComponentTypes.INTANGIBLE_PROJECTILE);
+        return getStackClient().has(DataComponents.INTANGIBLE_PROJECTILE);
     }
 
     @Override
     public void tick() {
         if (inGroundTime > 4) {
             hasHit = true;
-            if (!EnchantmentHelper.hasAnyEnchantmentsWith(getStackClient(), ModDataComponents.BACKSTABBING.get()))
+            if (!EnchantmentHelper.has(getStackClient(), ModDataComponents.BACKSTABBING.get()))
                 setDealtDamage(true);
         }
 
         Entity entity = getOwner();
         var loyaltyLevel = getLoyalty();
-        if (loyaltyLevel > 0 && !isIntangible() && (hasHit || isNoClip()) && entity != null) {
+        if (loyaltyLevel > 0 && !isIntangible() && (hasHit || isNoPhysics()) && entity != null) {
             if (!isOwnerAlive()) {
-                if (!getWorld().isClient && pickupType == PersistentProjectileEntity.PickupPermission.ALLOWED) {
-                    dropStack(asItemStack(), 0.1F);
+                if (!level().isClientSide && pickup == AbstractArrow.Pickup.ALLOWED) {
+                    spawnAtLocation(getPickupItem(), 0.1F);
                 }
 
                 discard();
             } else {
-                setNoClip(true);
-                Vec3d vec3d = entity.getEyePos().subtract(getPos());
-                setPos(getX(), getY() + vec3d.y * 0.015 * (double) loyaltyLevel, getZ());
-                if (getWorld().isClient) {
-                    lastRenderY = getY();
+                setNoPhysics(true);
+                Vec3 vec3d = entity.getEyePosition().subtract(position());
+                setPosRaw(getX(), getY() + vec3d.y * 0.015 * (double) loyaltyLevel, getZ());
+                if (level().isClientSide) {
+                    yOld = getY();
                 }
 
                 double d = 0.05 * (double) loyaltyLevel;
-                setVelocity(getVelocity().multiply(0.95).add(vec3d.normalize().multiply(d)));
+                setDeltaMovement(getDeltaMovement().scale(0.95).add(vec3d.normalize().scale(d)));
                 if (returnTimer == 0) {
-                    playSound(KitchenProjectilesSounds.returning(getItemStack()), 10.0F, 1.0F);
-                    setVelocity(0, 0, 0);
+                    playSound(KitchenProjectilesSounds.returning(getPickupItemStackOrigin()), 10.0F, 1.0F);
+                    setDeltaMovement(0, 0, 0);
                 }
 
                 returnTimer++;
@@ -133,123 +133,123 @@ public class KnifeEntity extends PersistentProjectileEntity {
 
     private boolean isOwnerAlive() {
         Entity owner = getOwner();
-        return owner != null && owner.isAlive() && (!(owner instanceof ServerPlayerEntity) || !owner.isSpectator());
+        return owner != null && owner.isAlive() && (!(owner instanceof ServerPlayer) || !owner.isSpectator());
     }
 
     @Override
-    protected ItemStack getDefaultItemStack() {
-        return ModItems.IRON_KNIFE.get().getDefaultStack();
+    protected ItemStack getDefaultPickupItem() {
+        return ModItems.IRON_KNIFE.get().getDefaultInstance();
     }
 
     public ItemStack getStackClient() {
-        return dataTracker.get(TRACKED_STACK);
+        return entityData.get(TRACKED_STACK);
     }
 
     @Override
-    protected void setStack(ItemStack stack) {
-        super.setStack(stack);
-        dataTracker.set(TRACKED_STACK, stack);
+    protected void setPickupItemStack(ItemStack stack) {
+        super.setPickupItemStack(stack);
+        entityData.set(TRACKED_STACK, stack);
     }
 
     @Override
-    protected boolean canHit(Entity entity) {
-        return super.canHit(entity) && (entity != getOwner() || !noClip);
+    protected boolean canHitEntity(Entity entity) {
+        return super.canHitEntity(entity) && (entity != getOwner() || !noPhysics);
     }
 
     @Nullable
     @Override
-    protected EntityHitResult getEntityCollision(Vec3d currentPosition, Vec3d nextPosition) {
-        return hasDealtDamage() ? null : super.getEntityCollision(currentPosition, nextPosition);
+    protected EntityHitResult findHitEntity(Vec3 currentPosition, Vec3 nextPosition) {
+        return hasDealtDamage() ? null : super.findHitEntity(currentPosition, nextPosition);
     }
 
     @Override
-    protected void onEntityHit(EntityHitResult entityHitResult) {
+    protected void onHitEntity(EntityHitResult entityHitResult) {
         var entity = entityHitResult.getEntity();
         var owner = getOwner();
-        var stack = getItemStack();
-        var damageSource = getDamageSources().create(KitchenProjectiles.KNIFE_DAMAGE, this, owner == null ? this : owner);
+        var stack = getPickupItemStackOrigin();
+        var damageSource = damageSources().source(KitchenProjectiles.KNIFE_DAMAGE, this, owner == null ? this : owner);
 
-        var damage = KitchenProjectilesUtil.getDamage(stack, damageSource, getWorld(), entity);
+        var damage = KitchenProjectilesUtil.getDamage(stack, damageSource, level(), entity);
 
-        if (entity instanceof LivingEntity livingEntity && BackstabbingEnchantment.isLookingBehindTarget(livingEntity, getPos()) && getWorld() instanceof ServerWorld serverLevel) {
+        if (entity instanceof LivingEntity livingEntity && BackstabbingEnchantment.isLookingBehindTarget(livingEntity, position()) && level() instanceof ServerLevel serverLevel) {
             var dmg = new MutableFloat(damage);
-            EnchantmentHelper.forEachEnchantment(getItemStack(), (enchantment, powerLevel) ->
-                    enchantment.value().modifyValue(ModDataComponents.BACKSTABBING.get(), serverLevel, powerLevel, stack, this, damageSource, dmg)
+            EnchantmentHelper.runIterationOnItem(getPickupItemStackOrigin(), (enchantment, powerLevel) ->
+                    enchantment.value().modifyDamageFilteredValue(ModDataComponents.BACKSTABBING.get(), serverLevel, powerLevel, stack, this, damageSource, dmg)
             );
 
             if (damage != dmg.getValue()) {
                 damage = dmg.getValue();
-                serverLevel.playSound(null, getX(), getY(), getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.BLOCKS, 1.0F, 1.0F);
+                serverLevel.playSound(null, getX(), getY(), getZ(), SoundEvents.PLAYER_ATTACK_CRIT, SoundSource.BLOCKS, 1.0F, 1.0F);
             }
         }
 
         hasHit = true;
         setDealtDamage(true);
-        if (entity.damage(damageSource, damage)) {
+        if (entity.hurt(damageSource, damage)) {
             if (entity.getType() == EntityType.ENDERMAN) {
                 return;
             }
 
             if (entity instanceof LivingEntity livingEntity2) {
-                if (owner instanceof LivingEntity && getWorld() instanceof ServerWorld serverWorld) {
-                    EnchantmentHelper.onTargetDamaged(serverWorld, entity, damageSource, stack);
+                if (owner instanceof LivingEntity && level() instanceof ServerLevel serverWorld) {
+                    EnchantmentHelper.doPostAttackEffectsWithItemSource(serverWorld, entity, damageSource, stack);
                 }
 
-                onHit(livingEntity2);
+                doPostHurtEffects(livingEntity2);
             }
         }
 
-        setVelocity(getVelocity().multiply(-0.01, -0.1, -0.01));
+        setDeltaMovement(getDeltaMovement().multiply(-0.01, -0.1, -0.01));
 
-        playSound(KitchenProjectilesSounds.hit(getItemStack()), 1.0F, 1.0F);
+        playSound(KitchenProjectilesSounds.hit(getPickupItemStackOrigin()), 1.0F, 1.0F);
     }
 
     @Override
-    protected void onBlockHitEnchantmentEffects(ServerWorld world, BlockHitResult blockHitResult, ItemStack weaponStack) {
+    protected void hitBlockEnchantmentEffects(ServerLevel world, BlockHitResult blockHitResult, ItemStack weaponStack) {
         EnchantmentHelper.onHitBlock(world,
                 weaponStack,
                 this.getOwner() instanceof LivingEntity livingEntity ? livingEntity : null,
                 this,
                 null,
-                blockHitResult.getBlockPos().clampToWithin(blockHitResult.getPos()),
+                blockHitResult.getBlockPos().clampLocationWithin(blockHitResult.getLocation()),
                 world.getBlockState(blockHitResult.getBlockPos()),
                 item -> kill());
     }
 
     @Override
-    protected boolean tryPickup(PlayerEntity player) {
+    protected boolean tryPickup(Player player) {
         var inventory = player.getInventory();
-        var stack = asItemStack();
-        return switch (this.pickupType) {
+        var stack = getPickupItem();
+        return switch (this.pickup) {
             case ALLOWED -> insertStack(inventory, slot, stack);
-            case CREATIVE_ONLY -> player.getAbilities().creativeMode;
+            case CREATIVE_ONLY -> player.getAbilities().instabuild;
             default -> false;
-        } || isNoClip() && isOwner(player) && insertStack(inventory, slot, stack);
+        } || isNoPhysics() && ownedBy(player) && insertStack(inventory, slot, stack);
     }
 
-    private static boolean insertStack(PlayerInventory playerInventory, int slot, ItemStack stack) {
-        if (slot >= 0 && playerInventory.getStack(slot).isEmpty()) {
-            playerInventory.setStack(slot, stack);
+    private static boolean insertStack(Inventory playerInventory, int slot, ItemStack stack) {
+        if (slot >= 0 && playerInventory.getItem(slot).isEmpty()) {
+            playerInventory.setItem(slot, stack);
             return true;
         }
-        return playerInventory.insertStack(stack);
+        return playerInventory.add(stack);
     }
 
     @Override
-    protected SoundEvent getHitSound() {
+    protected SoundEvent getDefaultHitGroundSoundEvent() {
         return KitchenProjectilesSounds.hitGround(getStackClient());
     }
 
     @Override
-    public void onPlayerCollision(PlayerEntity player) {
-        if (isOwner(player) || getOwner() == null) {
-            super.onPlayerCollision(player);
+    public void playerTouch(Player player) {
+        if (ownedBy(player) || getOwner() == null) {
+            super.playerTouch(player);
         }
     }
 
     @Override
-    public void readCustomDataFromNbt(NbtCompound nbt) {
-        super.readCustomDataFromNbt(nbt);
+    public void readAdditionalSaveData(CompoundTag nbt) {
+        super.readAdditionalSaveData(nbt);
         hasHit = nbt.getBoolean("HasHit");
         setDealtDamage(nbt.getBoolean("DealtDamage"));
         updateLoyalty();
@@ -257,17 +257,17 @@ public class KnifeEntity extends PersistentProjectileEntity {
     }
 
     @Override
-    public void writeCustomDataToNbt(NbtCompound nbt) {
-        super.writeCustomDataToNbt(nbt);
+    public void addAdditionalSaveData(CompoundTag nbt) {
+        super.addAdditionalSaveData(nbt);
         nbt.putBoolean("HasHit", hasHit);
         nbt.putBoolean("DealtDamage", hasDealtDamage());
         nbt.putInt("Slot", slot);
     }
 
     @Override
-    public void age() {
-        if (pickupType != PersistentProjectileEntity.PickupPermission.ALLOWED) {
-            super.age();
+    public void tickDespawn() {
+        if (pickup != AbstractArrow.Pickup.ALLOWED) {
+            super.tickDespawn();
         }
     }
 
@@ -277,16 +277,16 @@ public class KnifeEntity extends PersistentProjectileEntity {
     }
 
     @Override
-    public Text getName() {
-        return getStackClient().getName();
+    public Component getName() {
+        return getStackClient().getHoverName();
     }
 
     @Override
-    protected void tickInVoid() {
-        if (getLoyalty() <= 0) super.tickInVoid();
+    protected void onBelowWorld() {
+        if (getLoyalty() <= 0) super.onBelowWorld();
         if (!hasHit) {
             hasHit = true;
-            setVelocity(0, 0, 0);
+            setDeltaMovement(0, 0, 0);
         }
     }
 }

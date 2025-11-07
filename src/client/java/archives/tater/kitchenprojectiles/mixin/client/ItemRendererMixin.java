@@ -2,10 +2,10 @@ package archives.tater.kitchenprojectiles.mixin.client;
 
 import archives.tater.kitchenprojectiles.KnifeEntityRenderer;
 import com.llamalad7.mixinextras.sugar.Local;
-import net.minecraft.client.render.TexturedRenderLayers;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.item.ItemRenderer;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.entity.ItemRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
@@ -13,19 +13,19 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 @Mixin(ItemRenderer.class)
 public class ItemRendererMixin {
     @ModifyArg(
-            method = "renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformationMode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/render/model/BakedModel;)V",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/item/ItemRenderer;renderBakedItemModel(Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/item/ItemStack;IILnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;)V"),
+            method = "render(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;ZLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;IILnet/minecraft/client/resources/model/BakedModel;)V",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/ItemRenderer;renderModelLists(Lnet/minecraft/client/resources/model/BakedModel;Lnet/minecraft/world/item/ItemStack;IILcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;)V"),
             index = 5
     )
-    private VertexConsumer intangibleTranslucent(VertexConsumer vertices, @Local(argsOnly = true) VertexConsumerProvider vertexConsumers) {
+    private VertexConsumer intangibleTranslucent(VertexConsumer vertices, @Local(argsOnly = true) MultiBufferSource vertexConsumers) {
         if (!KnifeEntityRenderer.intangible)
             return vertices;
-        return vertexConsumers.getBuffer(TexturedRenderLayers.getItemEntityTranslucentCull());
+        return vertexConsumers.getBuffer(Sheets.translucentItemSheet());
     }
 
     @ModifyArg(
-            method = "renderBakedItemQuads",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumer;quad(Lnet/minecraft/client/util/math/MatrixStack$Entry;Lnet/minecraft/client/render/model/BakedQuad;FFFFII)V"),
+            method = "renderQuadList",
+            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/VertexConsumer;putBulkData(Lcom/mojang/blaze3d/vertex/PoseStack$Pose;Lnet/minecraft/client/renderer/block/model/BakedQuad;FFFFII)V"),
             index = 5
     )
     private float intangibleTranslucent(float alpha) {
