@@ -87,7 +87,7 @@ config="${mod_id}.mixins.json"
     side="BOTH"
 
 [[dependencies.${mod_id}]]
-    modId="fabric_api"
+    modId="forgified_fabric_api"
     type="required"
     versionRange="${fabric_version_range}"
     ordering="NONE"
