@@ -1,11 +1,9 @@
 package archives.tater.kitchenprojectiles;
 
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.fabricmc.fabric.api.item.v1.EnchantmentEvents;
@@ -49,6 +47,8 @@ public class KitchenProjectiles {
     public static final TagKey<Item> LIGHT_KNIVES = TagKey.create(Registries.ITEM, id("light_knives"));
 
     public KitchenProjectiles(IEventBus modEventBus, ModContainer modContainer) {
+        modEventBus.addListener(KitchenProjectiles::commonSetup);
+
         ENTITIES.register(modEventBus);
 
         KitchenProjectilesSounds.init(modEventBus);
@@ -56,10 +56,9 @@ public class KitchenProjectiles {
         // Register ourselves for server and other game events we are interested in.
         // Note that this is necessary if and only if we want *this* class (KitchenProjectiles) to respond directly to events.
         // Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.
-        NeoForge.EVENT_BUS.register(this);
+//        NeoForge.EVENT_BUS.register(this);
     }
 
-    @SubscribeEvent
     private static void commonSetup(FMLCommonSetupEvent event) {
         EnchantmentEvents.ALLOW_ENCHANTING.register((enchantment, target, enchantingContext) ->
                 target.is(ModTags.KNIFE_ENCHANTABLE) &&
