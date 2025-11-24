@@ -1,0 +1,9 @@
+{
+  "subtitles.entity.kitchenprojectiles.knife.throw": "Ніж летить",
+  "subtitles.entity.kitchenprojectiles.knife.hit": "Ніж втикається",
+  "subtitles.entity.kitchenprojectiles.knife.hit_ground": "Ніж вібрує",
+  "subtitles.entity.kitchenprojectiles.knife.return": "Ніж повертається",
+  "death.attack.kitchenprojectiles.knife": "%2$s заколов %1$s",
+  "death.attack.kitchenprojectiles.knife.item": "%2$s заколов %1$s за допомогою: %3$s",
+  "modmenu.descriptionTranslation.kitchenprojectiles": "Робить ножі Farmer's Delight придатними до кидання."
+}
