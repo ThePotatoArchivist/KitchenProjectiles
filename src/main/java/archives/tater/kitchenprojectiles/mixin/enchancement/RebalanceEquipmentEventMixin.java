@@ -14,7 +14,7 @@ public class RebalanceEquipmentEventMixin {
             method = "isMaceOrTrident",
             at = @At("RETURN")
     )
-    private static boolean allowKnife(boolean original, @Local(argsOnly = true) Player player) {
+    private static boolean allowKnife(boolean original, Player player) {
         return original || player.getUseItem().is(ModTags.Items.KNIVES);
     }
 }

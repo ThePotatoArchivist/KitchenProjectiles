@@ -35,8 +35,8 @@ public abstract class PersistentProjectileEntityMixin extends Projectile {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/projectile/arrow/AbstractArrow;isCritArrow()Z"),
             name = "physicsEnabled"
     )
-    private boolean hideNoClip(boolean value) {
-        return value || (Object) this instanceof KnifeEntity knifeEntity && !knifeEntity.hasDealtDamage();
+    private boolean hideNoPhysics(boolean physicsEnabled) {
+        return physicsEnabled || (Object) this instanceof KnifeEntity knifeEntity && !knifeEntity.hasDealtDamage();
     }
 
     @ModifyVariable(
@@ -44,7 +44,7 @@ public abstract class PersistentProjectileEntityMixin extends Projectile {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/projectile/arrow/AbstractArrow;isInWater()Z", ordinal = 1),
             name = "physicsEnabled"
     )
-    private boolean restoreNoClip(boolean value) {
+    private boolean restoreNoPhysics(boolean physicsEnabled) {
         return !isNoPhysics();
     }
 
@@ -54,12 +54,12 @@ public abstract class PersistentProjectileEntityMixin extends Projectile {
             at = @At(value = "INVOKE", target = "Ljava/util/Objects;requireNonNullElse(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
             cancellable = true
     )
-    private void cancelCollision(BlockHitResult blockHitResult, CallbackInfo ci, @Local(name = "firstEntityHit") EntityHitResult entityHitResult, @Share("hit")LocalRef<EntityHitResult> hit) {
-        if ((Object) this instanceof KnifeEntity knifeEntity && !knifeEntity.hasDealtDamage() && entityHitResult == null && isNoPhysics()) {
+    private void cancelCollision(BlockHitResult blockHitResult, CallbackInfo ci, @Local(name = "firstEntityHit") EntityHitResult firstEntityHit, @Share("hit")LocalRef<EntityHitResult> hit) {
+        if ((Object) this instanceof KnifeEntity knifeEntity && !knifeEntity.hasDealtDamage() && firstEntityHit == null && isNoPhysics()) {
             setPos(position().add(getDeltaMovement()));
             ci.cancel();
         }
-        hit.set(entityHitResult);
+        hit.set(firstEntityHit);
     }
 
     @SuppressWarnings("ConstantValue")

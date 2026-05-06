@@ -17,7 +17,7 @@ public class FrozenComponentMixin {
             method = "isSourceFrostbiteWeapon",
             at = @At("RETURN")
     )
-    private static boolean checkKnife(boolean original, @Local(argsOnly = true) DamageSource source) {
+    private static boolean checkKnife(boolean original, DamageSource source) {
         return original || source.getDirectEntity() instanceof KnifeEntity knifeEntity && EnchantmentHelper.hasTag(knifeEntity.getPickupItemStackOrigin(), ModEnchantmentTags.FREEZES_ENTITIES);
     }
 }

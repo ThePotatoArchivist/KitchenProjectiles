@@ -50,11 +50,11 @@ public abstract class ItemMixin {
             at = @At("HEAD"),
             cancellable = true
     )
-	public void throwUse(Level level, Player player, InteractionHand usedHand, CallbackInfoReturnable<InteractionResult> cir) {
-		var stack = player.getItemInHand(usedHand);
+	public void throwUse(Level level, Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
+		var stack = player.getItemInHand(hand);
 		if (!stack.is(KitchenProjectiles.THROWABLE_KNIVES) || (stack.isDamageableItem() && stack.getMaxDamage() - stack.getDamageValue() <= 1) || level.getBlockState(getPlayerPOVHitResult(level, player, ClipContext.Fluid.NONE).getBlockPos()).is(ModBlocks.CUTTING_BOARD.get()))
 			return;
-		player.startUsingItem(usedHand);
+		player.startUsingItem(hand);
 		cir.setReturnValue(InteractionResult.CONSUME);
 	}
 
@@ -78,20 +78,20 @@ public abstract class ItemMixin {
             method = "releaseUsing",
             at = @At("HEAD")
     )
-    private void throwRelease(ItemStack stack, Level level, LivingEntity livingEntity, int timeCharged, CallbackInfoReturnable<Boolean> cir) {
-        if (!stack.is(KitchenProjectiles.THROWABLE_KNIVES)) return;
-        if (!(livingEntity instanceof Player playerEntity)) return;
-        if (livingEntity.getTicksUsingItem() < 6) return;
+    private void throwRelease(ItemStack itemStack, Level level, LivingEntity entity, int remainingTime, CallbackInfoReturnable<Boolean> cir) {
+        if (!itemStack.is(KitchenProjectiles.THROWABLE_KNIVES)) return;
+        if (!(entity instanceof Player playerEntity)) return;
+        if (entity.getTicksUsingItem() < 6) return;
 
         if (!(level instanceof ServerLevel serverLevel)) return;
 
-        stack.hurtAndBreak(1, livingEntity, livingEntity.getUsedItemHand());
+        itemStack.hurtAndBreak(1, entity, entity.getUsedItemHand());
 
-        var multishot = EnchantmentHelper.processProjectileCount(serverLevel, stack, livingEntity, 1);
-        var spread = EnchantmentHelper.processProjectileSpread(serverLevel, stack, livingEntity, 0f);
+        var multishot = EnchantmentHelper.processProjectileCount(serverLevel, itemStack, entity, 1);
+        var spread = EnchantmentHelper.processProjectileSpread(serverLevel, itemStack, entity, 0f);
 
         for (var i = 0; i < multishot; i++) {
-            var projectileStack = stack.copyWithCount(1);
+            var projectileStack = itemStack.copyWithCount(1);
             if (i != 0)
                 projectileStack.set(DataComponents.INTANGIBLE_PROJECTILE, Unit.INSTANCE);
 
@@ -101,9 +101,9 @@ public abstract class ItemMixin {
 
             var yaw = spread * spreadIndex;
 
-            var opposite = livingEntity.getUpVector(1f);
+            var opposite = entity.getUpVector(1f);
             var quaternion = new Quaternionf().setAngleAxis(yaw * DEG_TO_RAD, opposite.x, opposite.y, opposite.z);
-            var rotation = livingEntity.getViewVector(1f);
+            var rotation = entity.getViewVector(1f);
             var velocity = rotation.toVector3f().rotate(quaternion);
 
             knifeEntity.shoot(velocity.x, velocity.y, velocity.z, 1.5f, 1f);
@@ -114,11 +114,11 @@ public abstract class ItemMixin {
 
             level.addFreshEntity(knifeEntity);
             if (i == 0)
-                level.playSound(null, knifeEntity, KitchenProjectilesSounds.throwing(stack), SoundSource.PLAYERS, 1.0F, 1.0F);
+                level.playSound(null, knifeEntity, KitchenProjectilesSounds.throwing(itemStack), SoundSource.PLAYERS, 1.0F, 1.0F);
         }
 
         if (!playerEntity.getAbilities().instabuild)
-            stack.shrink(1);
+            itemStack.shrink(1);
 
         playerEntity.awardStat(Stats.ITEM_USED.get((Item) (Object) this));
     }

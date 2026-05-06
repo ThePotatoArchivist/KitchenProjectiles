@@ -26,7 +26,7 @@ public class DamageSourceMixin {
             at = @At("STORE"),
             name = "held"
     )
-    private ItemStack useKnifeStack(ItemStack value) {
-        return directEntity instanceof KnifeEntity knifeEntity ? knifeEntity.getPickupItemStackOrigin() : value;
+    private ItemStack useKnifeStack(ItemStack held) {
+        return directEntity instanceof KnifeEntity knifeEntity ? knifeEntity.getPickupItemStackOrigin() : held;
     }
 }
