@@ -30,19 +30,19 @@ import vectorwing.farmersdelight.common.item.enchantment.BackstabbingEnchantment
 import vectorwing.farmersdelight.common.registry.ModDataComponents;
 import vectorwing.farmersdelight.common.registry.ModItems;
 
-public class KnifeEntity extends AbstractArrow {
-    private static final EntityDataAccessor<Byte> LOYALTY = SynchedEntityData.defineId(KnifeEntity.class, EntityDataSerializers.BYTE);
-    private static final EntityDataAccessor<ItemStack> TRACKED_STACK = SynchedEntityData.defineId(KnifeEntity.class, EntityDataSerializers.ITEM_STACK);
-    private static final EntityDataAccessor<Boolean> DEALT_DAMAGE = SynchedEntityData.defineId(KnifeEntity.class, EntityDataSerializers.BOOLEAN);
+public class ThrownKnife extends AbstractArrow {
+    private static final EntityDataAccessor<Byte> LOYALTY = SynchedEntityData.defineId(ThrownKnife.class, EntityDataSerializers.BYTE);
+    private static final EntityDataAccessor<ItemStack> TRACKED_STACK = SynchedEntityData.defineId(ThrownKnife.class, EntityDataSerializers.ITEM_STACK);
+    private static final EntityDataAccessor<Boolean> DEALT_DAMAGE = SynchedEntityData.defineId(ThrownKnife.class, EntityDataSerializers.BOOLEAN);
     private boolean hasHit;
     private int slot = -1;
     public int returnTimer;
 
-    protected KnifeEntity(EntityType<? extends AbstractArrow> entityType, Level level) {
+    protected ThrownKnife(EntityType<? extends AbstractArrow> entityType, Level level) {
         super(entityType, level);
     }
 
-    public KnifeEntity(Level level, LivingEntity owner, ItemStack stack) {
+    public ThrownKnife(Level level, LivingEntity owner, ItemStack stack) {
         super(KitchenProjectiles.KNIFE_ENTITY, owner, level, stack, null);
         entityData.set(TRACKED_STACK, getPickupItemStackOrigin()); // minecraft:intangible_projectile is removed from instance but not copy
         updateLoyalty();

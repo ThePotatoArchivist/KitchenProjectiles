@@ -1,6 +1,6 @@
 package archives.tater.kitchenprojectiles.mixin.client;
 
-import archives.tater.kitchenprojectiles.KitchenProjectilesClient;
+import archives.tater.kitchenprojectiles.client.KitchenProjectilesClient;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

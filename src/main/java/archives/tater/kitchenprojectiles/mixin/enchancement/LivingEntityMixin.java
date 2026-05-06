@@ -1,7 +1,6 @@
 package archives.tater.kitchenprojectiles.mixin.enchancement;
 
-import archives.tater.kitchenprojectiles.KnifeEntity;
-import com.llamalad7.mixinextras.sugar.Local;
+import archives.tater.kitchenprojectiles.ThrownKnife;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
@@ -20,8 +19,8 @@ public class LivingEntityMixin {
             name = "damage"
     )
     private float applyKnifeRage(float damage, ServerLevel level, DamageSource source) {
-        if (!(source.getDirectEntity() instanceof KnifeEntity knifeEntity) || !(knifeEntity.getOwner() instanceof LivingEntity livingEntity) || knifeEntity.level().isClientSide())
+        if (!(source.getDirectEntity() instanceof ThrownKnife thrownKnife) || !(thrownKnife.getOwner() instanceof LivingEntity livingEntity) || thrownKnife.level().isClientSide())
             return damage;
-        return damage + RageEffect.getDamageDealtModifier(livingEntity, knifeEntity.getPickupItemStackOrigin());
+        return damage + RageEffect.getDamageDealtModifier(livingEntity, thrownKnife.getPickupItemStackOrigin());
     }
 }

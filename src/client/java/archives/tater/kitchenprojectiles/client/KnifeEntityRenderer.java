@@ -1,9 +1,9 @@
-package archives.tater.kitchenprojectiles;
+package archives.tater.kitchenprojectiles.client;
+
+import archives.tater.kitchenprojectiles.ThrownKnife;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -15,8 +15,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemDisplayContext;
 
-public class KnifeEntityRenderer extends EntityRenderer<KnifeEntity, KnifeEntityRenderer.KnifeEntityRenderState> {
-    private static final float MIN_DISTANCE = 3.5f * 3.5f;
+public class KnifeEntityRenderer extends EntityRenderer<ThrownKnife, KnifeEntityRenderer.KnifeEntityRenderState> {
     private final ItemModelResolver itemModelManager;
     private final float scale;
     private final boolean lit;
@@ -35,7 +34,7 @@ public class KnifeEntityRenderer extends EntityRenderer<KnifeEntity, KnifeEntity
     }
 
     @Override
-    protected int getBlockLightLevel(KnifeEntity entity, BlockPos pos) {
+    protected int getBlockLightLevel(ThrownKnife entity, BlockPos pos) {
         return lit ? 15 : super.getBlockLightLevel(entity, pos);
     }
 
@@ -45,7 +44,7 @@ public class KnifeEntityRenderer extends EntityRenderer<KnifeEntity, KnifeEntity
     }
 
     @Override
-    public void extractRenderState(KnifeEntity entity, KnifeEntityRenderState state, float tickProgress) {
+    public void extractRenderState(ThrownKnife entity, KnifeEntityRenderState state, float tickProgress) {
         super.extractRenderState(entity, state, tickProgress);
 
         // see ProjectileEntityRenderer#updateRenderState

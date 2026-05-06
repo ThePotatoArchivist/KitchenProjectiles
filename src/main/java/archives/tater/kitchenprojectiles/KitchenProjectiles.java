@@ -38,9 +38,9 @@ public class KitchenProjectiles implements ModInitializer {
         return Registry.register(BuiltInRegistries.ENTITY_TYPE, key, type.build(key));
     }
 
-	public static final EntityType<KnifeEntity> KNIFE_ENTITY = register(
+	public static final EntityType<ThrownKnife> KNIFE_ENTITY = register(
 			id("knife"),
-			EntityType.Builder.<KnifeEntity>of(KnifeEntity::new, MobCategory.MISC)
+			EntityType.Builder.<ThrownKnife>of(ThrownKnife::new, MobCategory.MISC)
 					.sized(0.4f, 0.4f)
 					.clientTrackingRange(4)
 					.updateInterval(20)

@@ -1,8 +1,7 @@
 package archives.tater.kitchenprojectiles.mixin.enchancement;
 
-import archives.tater.kitchenprojectiles.KnifeEntity;
+import archives.tater.kitchenprojectiles.ThrownKnife;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import com.llamalad7.mixinextras.sugar.Local;
 
 import moriyashiine.enchancement.common.component.entity.enchantmenteffecttype.FrozenComponent;
 import moriyashiine.enchancement.common.tag.ModEnchantmentTags;
@@ -18,6 +17,6 @@ public class FrozenComponentMixin {
             at = @At("RETURN")
     )
     private static boolean checkKnife(boolean original, DamageSource source) {
-        return original || source.getDirectEntity() instanceof KnifeEntity knifeEntity && EnchantmentHelper.hasTag(knifeEntity.getPickupItemStackOrigin(), ModEnchantmentTags.FREEZES_ENTITIES);
+        return original || source.getDirectEntity() instanceof ThrownKnife thrownKnife && EnchantmentHelper.hasTag(thrownKnife.getPickupItemStackOrigin(), ModEnchantmentTags.FREEZES_ENTITIES);
     }
 }

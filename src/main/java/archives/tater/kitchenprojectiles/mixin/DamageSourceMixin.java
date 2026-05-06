@@ -1,6 +1,6 @@
 package archives.tater.kitchenprojectiles.mixin;
 
-import archives.tater.kitchenprojectiles.KnifeEntity;
+import archives.tater.kitchenprojectiles.ThrownKnife;
 
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,6 +27,6 @@ public class DamageSourceMixin {
             name = "held"
     )
     private ItemStack useKnifeStack(ItemStack held) {
-        return directEntity instanceof KnifeEntity knifeEntity ? knifeEntity.getPickupItemStackOrigin() : held;
+        return directEntity instanceof ThrownKnife thrownKnife ? thrownKnife.getPickupItemStackOrigin() : held;
     }
 }

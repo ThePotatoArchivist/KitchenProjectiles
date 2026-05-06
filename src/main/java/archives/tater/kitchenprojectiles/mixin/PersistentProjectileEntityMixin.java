@@ -1,6 +1,6 @@
 package archives.tater.kitchenprojectiles.mixin;
 
-import archives.tater.kitchenprojectiles.KnifeEntity;
+import archives.tater.kitchenprojectiles.ThrownKnife;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
@@ -36,7 +36,7 @@ public abstract class PersistentProjectileEntityMixin extends Projectile {
             name = "physicsEnabled"
     )
     private boolean hideNoPhysics(boolean physicsEnabled) {
-        return physicsEnabled || (Object) this instanceof KnifeEntity knifeEntity && !knifeEntity.hasDealtDamage();
+        return physicsEnabled || (Object) this instanceof ThrownKnife thrownKnife && !thrownKnife.hasDealtDamage();
     }
 
     @ModifyVariable(
@@ -55,7 +55,7 @@ public abstract class PersistentProjectileEntityMixin extends Projectile {
             cancellable = true
     )
     private void cancelCollision(BlockHitResult blockHitResult, CallbackInfo ci, @Local(name = "firstEntityHit") EntityHitResult firstEntityHit, @Share("hit")LocalRef<EntityHitResult> hit) {
-        if ((Object) this instanceof KnifeEntity knifeEntity && !knifeEntity.hasDealtDamage() && firstEntityHit == null && isNoPhysics()) {
+        if ((Object) this instanceof ThrownKnife thrownKnife && !thrownKnife.hasDealtDamage() && firstEntityHit == null && isNoPhysics()) {
             setPos(position().add(getDeltaMovement()));
             ci.cancel();
         }
@@ -68,6 +68,6 @@ public abstract class PersistentProjectileEntityMixin extends Projectile {
             at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/projectile/arrow/AbstractArrow;noPhysics:Z", opcode = Opcodes.GETFIELD)
     )
     private boolean allowCollision(boolean original, @Share("hit") LocalRef<EntityHitResult> hit) {
-        return original && hit.get() != null && (!((Object) this instanceof KnifeEntity knifeEntity) || knifeEntity.hasDealtDamage());
+        return original && hit.get() != null && (!((Object) this instanceof ThrownKnife thrownKnife) || thrownKnife.hasDealtDamage());
     }
 }

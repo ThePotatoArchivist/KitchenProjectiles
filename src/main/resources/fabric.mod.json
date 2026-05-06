@@ -19,7 +19,7 @@
 			"archives.tater.kitchenprojectiles.KitchenProjectiles"
 		],
 		"client": [
-			"archives.tater.kitchenprojectiles.KitchenProjectilesClient"
+			"archives.tater.kitchenprojectiles.client.KitchenProjectilesClient"
 		]
 	},
 	"mixins": [

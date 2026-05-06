@@ -2,7 +2,7 @@ package archives.tater.kitchenprojectiles.mixin;
 
 import archives.tater.kitchenprojectiles.KitchenProjectiles;
 import archives.tater.kitchenprojectiles.KitchenProjectilesSounds;
-import archives.tater.kitchenprojectiles.KnifeEntity;
+import archives.tater.kitchenprojectiles.ThrownKnife;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import org.spongepowered.asm.mixin.Mixin;
@@ -95,7 +95,7 @@ public abstract class ItemMixin {
             if (i != 0)
                 projectileStack.set(DataComponents.INTANGIBLE_PROJECTILE, Unit.INSTANCE);
 
-            var knifeEntity = new KnifeEntity(level, playerEntity, projectileStack);
+            var knifeEntity = new ThrownKnife(level, playerEntity, projectileStack);
 
             var spreadIndex = (2 * (i % 2) - 1) * (i + 1) / 2; // 0, 1, -1, 2, -2, etc.
 

@@ -1,6 +1,6 @@
 //package archives.tater.kitchenprojectiles.mixin.client;
 //
-//import archives.tater.kitchenprojectiles.KnifeEntityRenderer;
+//import archives.tater.kitchenprojectiles.client.KnifeEntityRenderer;
 //import com.llamalad7.mixinextras.sugar.Local;
 //import com.mojang.blaze3d.vertex.VertexConsumer;
 //import net.minecraft.client.renderer.MultiBufferSource;
