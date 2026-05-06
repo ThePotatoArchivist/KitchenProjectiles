@@ -1,6 +1,5 @@
 package archives.tater.kitchenprojectiles.mixin.client.enchancement;
 
-import moriyashiine.enchancement.client.event.config.ToggleablePassivesEvent;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import org.spongepowered.asm.mixin.Final;
@@ -9,11 +8,13 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import moriyashiine.enchancement.client.event.config.ToggleablePassivesClientEvent;
 import vectorwing.farmersdelight.common.tag.ModTags;
 
 import java.util.Map;
 
-@Mixin(value = ToggleablePassivesEvent.class, remap = false)
+@Mixin(value = ToggleablePassivesClientEvent.class, remap = false)
 public class ToggleablePassivesEventMixin {
     @Shadow
     @Final
@@ -24,6 +25,6 @@ public class ToggleablePassivesEventMixin {
             at = @At("TAIL")
     )
     private static void addKnives(CallbackInfo ci) {
-        KEY_MAP.put(ModTags.KNIFE_ENCHANTABLE, "tooltip.enchancement.has_loyalty");
+        KEY_MAP.put(ModTags.Items.KNIFE_ENCHANTABLE, "tooltip.enchancement.has_loyalty");
     }
 }

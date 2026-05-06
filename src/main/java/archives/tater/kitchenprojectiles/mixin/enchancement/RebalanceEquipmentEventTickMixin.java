@@ -14,9 +14,9 @@ import vectorwing.farmersdelight.common.tag.ModTags;
 public class RebalanceEquipmentEventTickMixin {
     @ModifyExpressionValue(
             method = "tick",
-            at = @At(value = "INVOKE", target = "Lmoriyashiine/enchancement/common/util/EnchancementUtil;getTridentChargeTime()I")
+            at = @At(value = "INVOKE", target = "Lmoriyashiine/enchancement/common/util/EnchancementUtil;getMaceOrTridentChargeTime(Lnet/minecraft/world/item/ItemStack;)I")
     )
     private int useKnifeTime(int original, @Local(argsOnly = true) Entity entity) {
-        return entity instanceof LivingEntity livingEntity && livingEntity.getUseItem().is(ModTags.KNIVES) ? KitchenProjectiles.MIN_USE_DURATION : original;
+        return entity instanceof LivingEntity livingEntity && livingEntity.getUseItem().is(ModTags.Items.KNIVES) ? KitchenProjectiles.MIN_USE_DURATION : original;
     }
 }

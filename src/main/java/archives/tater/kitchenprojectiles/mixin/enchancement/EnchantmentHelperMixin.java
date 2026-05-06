@@ -15,7 +15,7 @@ import vectorwing.farmersdelight.common.tag.ModTags;
 public class EnchantmentHelperMixin {
     @ModifyReturnValue(method = "getTridentReturnToOwnerAcceleration", at = @At("RETURN"))
     private static int knifePassiveLoyalty(int original, @Local(argsOnly = true) ItemStack stack) {
-        if (!ModConfig.toggleablePassives || !stack.is(ModTags.KNIFE_ENCHANTABLE) || stack.is(ModItemTags.NO_LOYALTY) || !stack.getOrDefault(ModComponentTypes.TOGGLEABLE_PASSIVE, false)) return original;
+        if (!ModConfig.toggleablePassives || !stack.is(ModTags.Items.KNIFE_ENCHANTABLE) || stack.is(ModItemTags.NO_LOYALTY) || !stack.getOrDefault(ModComponentTypes.TOGGLEABLE_PASSIVE, false)) return original;
         if (!stack.isEnchanted()) {
             stack.remove(ModComponentTypes.TOGGLEABLE_PASSIVE);
             return original;

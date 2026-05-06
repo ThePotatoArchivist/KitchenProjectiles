@@ -11,10 +11,10 @@ import vectorwing.farmersdelight.common.tag.ModTags;
 @Mixin(value = RebalanceEquipmentEvent.class, remap = false)
 public class RebalanceEquipmentEventMixin {
     @ModifyReturnValue(
-            method = "isValid",
+            method = "isMaceOrTrident",
             at = @At("RETURN")
     )
     private static boolean allowKnife(boolean original, @Local(argsOnly = true) Player player) {
-        return original || player.getUseItem().is(ModTags.KNIVES);
+        return original || player.getUseItem().is(ModTags.Items.KNIVES);
     }
 }

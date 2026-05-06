@@ -60,7 +60,7 @@ public class KitchenProjectiles implements ModInitializer {
 		KitchenProjectilesSounds.init();
 
         EnchantmentEvents.ALLOW_ENCHANTING.register((enchantment, target, enchantingContext) ->
-            target.is(ModTags.KNIFE_ENCHANTABLE) &&
+            target.is(ModTags.Items.KNIFE_ENCHANTABLE) &&
                     enchantment.unwrapKey().map(key -> key == Enchantments.LOYALTY || key == Enchantments.MULTISHOT).orElse(false)
                     ? TriState.TRUE
                     : TriState.DEFAULT
