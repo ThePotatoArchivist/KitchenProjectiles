@@ -2,9 +2,6 @@ package archives.tater.kitchenprojectiles.client;
 
 import archives.tater.kitchenprojectiles.KnifeEntity;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -20,7 +17,6 @@ import net.minecraft.world.item.ItemDisplayContext;
 
 import org.jetbrains.annotations.NotNull;
 
-@Environment(EnvType.CLIENT)
 public class KnifeEntityRenderer extends EntityRenderer<KnifeEntity> {
     private static final float MIN_DISTANCE = 3.5f * 3.5f;
     private final ItemRenderer itemRenderer;
