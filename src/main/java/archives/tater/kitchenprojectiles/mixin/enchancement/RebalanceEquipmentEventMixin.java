@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import vectorwing.farmersdelight.common.tag.ModTags;
 
-@Mixin(value = RebalanceEquipmentEvent.class, remap = false)
+@Mixin(value = RebalanceEquipmentEvent.class)
 public class RebalanceEquipmentEventMixin {
     @ModifyReturnValue(
             method = "isMaceOrTrident",

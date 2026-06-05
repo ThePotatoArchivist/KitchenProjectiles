@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import vectorwing.farmersdelight.common.tag.ModTags;
 
-@Mixin(value = RebalanceEquipmentEvent.Tick.class, remap = false)
+@Mixin(targets = "moriyashiine/enchancement/common/event/config/RebalanceEquipmentEvent$Tick")
 public class RebalanceEquipmentEventTickMixin {
     @ModifyExpressionValue(
             method = "tick",

@@ -10,10 +10,10 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(value = FrozenComponent.class, remap = false)
+@Mixin(value = FrozenComponent.class)
 public class FrozenComponentMixin {
     @ModifyReturnValue(
-            method = "isSourceFrostbiteWeapon",
+            method = "isSourceFreezeWeapon",
             at = @At("RETURN")
     )
     private static boolean checkKnife(boolean original, DamageSource source) {

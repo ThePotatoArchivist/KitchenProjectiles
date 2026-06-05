@@ -14,7 +14,7 @@ import vectorwing.farmersdelight.common.tag.ModTags;
 
 import java.util.Map;
 
-@Mixin(value = ToggleablePassivesClientEvent.class, remap = false)
+@Mixin(value = ToggleablePassivesClientEvent.class)
 public class ToggleablePassivesClientEventMixin {
     @Shadow
     @Final
