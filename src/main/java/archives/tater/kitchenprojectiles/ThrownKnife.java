@@ -12,6 +12,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -189,7 +190,7 @@ public class ThrownKnife extends AbstractArrow {
         hasHit = true;
         setDealtDamage(true);
         if (entity.hurtOrSimulate(damageSource, damage)) {
-            if (entity.getType() == EntityType.ENDERMAN) {
+            if (entity.getType() == EntityTypes.ENDERMAN) {
                 return;
             }
 

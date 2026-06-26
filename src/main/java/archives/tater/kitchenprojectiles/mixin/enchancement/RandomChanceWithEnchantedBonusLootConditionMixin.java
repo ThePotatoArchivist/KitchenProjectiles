@@ -2,14 +2,16 @@ package archives.tater.kitchenprojectiles.mixin.enchancement;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import moriyashiine.enchancement.common.init.ModEnchantments;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceWithEnchantedBonusCondition;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
+
+import moriyashiine.enchancement.common.init.EnchancementEnchantments;
 
 @Mixin(LootItemRandomChanceWithEnchantedBonusCondition.class)
 public class RandomChanceWithEnchantedBonusLootConditionMixin {
@@ -18,6 +20,6 @@ public class RandomChanceWithEnchantedBonusLootConditionMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/core/HolderLookup$RegistryLookup;getOrThrow(Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/core/Holder$Reference;")
     )
     private static Holder.Reference<Enchantment> handleMissingLooting(HolderLookup.RegistryLookup<Enchantment> instance, ResourceKey<Enchantment> registryKey, Operation<Holder.Reference<Enchantment>> original) {
-        return instance.get(registryKey).orElse(instance.getOrThrow(ModEnchantments.EMPTY_KEY));
+        return instance.get(registryKey).orElse(instance.getOrThrow(EnchancementEnchantments.EMPTY_KEY));
     }
 }
