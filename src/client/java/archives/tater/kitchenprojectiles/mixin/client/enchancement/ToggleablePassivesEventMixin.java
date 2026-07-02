@@ -24,6 +24,6 @@ public class ToggleablePassivesEventMixin {
             at = @At("TAIL")
     )
     private static void addKnives(CallbackInfo ci) {
-        KEY_MAP.put(ModTags.KNIFE_ENCHANTABLE, "tooltip.enchancement.has_loyalty");
+        KEY_MAP.put(ModTags.Items.KNIFE_ENCHANTABLE, "tooltip.enchancement.has_loyalty");
     }
 }
