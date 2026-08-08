@@ -7,6 +7,7 @@
     "DamageSourcePredicateMixin",
     "ItemMixin",
     "PersistentProjectileEntityMixin",
+    "enchancement.EnchancementUtilMixin",
     "enchancement.EnchantmentHelperMixin",
     "enchancement.FrozenComponentMixin",
     "enchancement.LivingEntityMixin",
