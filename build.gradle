@@ -92,7 +92,7 @@ dependencies {
 		exclude(group: "net.fabricmc")
 	}
 
-    compileOnly("moriyashiine:enchancement:${project.enchancement_version}") {
+    compileOnly("moriyashiine.enchancement:enchancement-fabric:${project.enchancement_version}") {
         exclude(group: "net.fabricmc")
     }
 }
