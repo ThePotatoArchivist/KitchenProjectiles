@@ -164,6 +164,7 @@ public class ThrownKnife extends AbstractArrow {
         return hasDealtDamage() ? null : super.findHitEntity(currentPosition, nextPosition);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     protected void onHitEntity(EntityHitResult entityHitResult) {
         var entity = entityHitResult.getEntity();
