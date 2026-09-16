@@ -12,6 +12,6 @@
   "mixins": [
     "AvatarRendererMixin",
     "ItemInHandLayerMixin",
-    "ItemInHandRendererMixin"
+    "FirstPersonHandsAndItemsRendererMixin"
   ]
 }

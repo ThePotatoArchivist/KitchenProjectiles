@@ -63,11 +63,11 @@ public class KnifeEntityRenderer extends EntityRenderer<ThrownKnife, KnifeEntity
         matrices.pushPose();
         matrices.scale(0.85f * scale, 0.85f * scale, 0.85f * scale);
         matrices.translate(0, -0.1f, 0);
-        matrices.mulPose(Axis.YP.rotationDegrees(state.yRot - 90.0F));
-        matrices.mulPose(Axis.ZP.rotationDegrees(state.xRot + 90.0F));
+        matrices.rotate(Axis.YP.rotationDegrees(state.yRot - 90.0F));
+        matrices.rotate(Axis.ZP.rotationDegrees(state.xRot + 90.0F));
         matrices.translate(scale * 0.2, scale * 0.1, 0);
-        matrices.mulPose(Axis.ZP.rotationDegrees(-45));
-        matrices.mulPose(Axis.XP.rotationDegrees(180));
+        matrices.rotate(Axis.ZP.rotationDegrees(-45));
+        matrices.rotate(Axis.XP.rotationDegrees(180));
 
         if (state.intangible)
             intangible = true;

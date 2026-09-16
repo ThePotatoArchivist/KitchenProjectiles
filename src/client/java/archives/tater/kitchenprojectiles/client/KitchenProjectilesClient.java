@@ -15,12 +15,12 @@ public class KitchenProjectilesClient implements ClientModInitializer {
 
 	public static void transformFirstPerson(PoseStack poseStack, boolean rightArm) {
 		poseStack.translate(rightArm ? 0.3 : -0.3, 0, -0.1);
-		poseStack.mulPose(Axis.XP.rotationDegrees(-45));
+		poseStack.rotate(Axis.XP.rotationDegrees(-45));
 	}
 
     public static void transformThirdPerson(PoseStack poseStack) {
 		poseStack.translate(0, -0.3, 0.15);
-		poseStack.mulPose(Axis.XP.rotationDegrees(-160));
+		poseStack.rotate(Axis.XP.rotationDegrees(-160));
     }
 
 	@Override
