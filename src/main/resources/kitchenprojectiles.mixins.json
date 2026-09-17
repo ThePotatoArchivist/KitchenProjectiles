@@ -11,7 +11,6 @@
     "enchancement.EnchantmentHelperMixin",
     "enchancement.FrozenComponentMixin",
     "enchancement.LivingEntityMixin",
-    "enchancement.RandomChanceWithEnchantedBonusLootConditionMixin",
     "enchancement.RebalanceEquipmentEventMixin",
     "enchancement.RebalanceEquipmentEventTickMixin"
   ],
